@@ -1,0 +1,1834 @@
+{
+  "cleaning_questions": [
+    {
+      "id": 1,
+      "cat": "Exploration",
+      "q": "Count total records in customers_raw.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS total_records\nFROM customers_raw;"
+    },
+    {
+      "id": 2,
+      "cat": "Exploration",
+      "q": "Find distinct customer_id values.",
+      "difficulty": "Beginner",
+      "sol": "SELECT DISTINCT customer_id\nFROM customers_raw\nORDER BY customer_id;"
+    },
+    {
+      "id": 3,
+      "cat": "Exploration",
+      "q": "Count duplicate customer_id entries.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) - COUNT(DISTINCT customer_id) AS duplicate_count\nFROM customers_raw;"
+    },
+    {
+      "id": 4,
+      "cat": "Exploration",
+      "q": "Find rows where first_name is empty or NULL.",
+      "difficulty": "Beginner",
+      "sol": "SELECT *\nFROM customers_raw\nWHERE first_name IS NULL\n   OR TRIM(first_name) = '';"
+    },
+    {
+      "id": 5,
+      "cat": "Exploration",
+      "q": "Find rows where last_name is empty or NULL.",
+      "difficulty": "Beginner",
+      "sol": "SELECT *\nFROM customers_raw\nWHERE last_name IS NULL\n   OR TRIM(last_name) = '';"
+    },
+    {
+      "id": 6,
+      "cat": "Exploration",
+      "q": "Count rows with NULL phone numbers.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS null_phone_count\nFROM customers_raw\nWHERE phone IS NULL;"
+    },
+    {
+      "id": 7,
+      "cat": "Exploration",
+      "q": "Count customers per state.",
+      "difficulty": "Beginner",
+      "sol": "SELECT state, COUNT(*) AS customer_count\nFROM customers_raw\nGROUP BY state\nORDER BY customer_count DESC;"
+    },
+    {
+      "id": 8,
+      "cat": "Exploration",
+      "q": "Find distinct customer_segment values.",
+      "difficulty": "Beginner",
+      "sol": "SELECT DISTINCT customer_segment\nFROM customers_raw\nORDER BY customer_segment;"
+    },
+    {
+      "id": 9,
+      "cat": "Exploration",
+      "q": "Find customers where notes is empty or NULL.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id, first_name, last_name\nFROM customers_raw\nWHERE notes IS NULL\n   OR TRIM(notes) = '';"
+    },
+    {
+      "id": 10,
+      "cat": "Exploration",
+      "q": "Count records where income contains letter K.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS k_income_count\nFROM customers_raw\nWHERE income ILIKE '%K%';"
+    },
+    {
+      "id": 11,
+      "cat": "Exploration",
+      "q": "Count customers with NULL last_purchase_date.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS null_purchase_date\nFROM customers_raw\nWHERE last_purchase_date IS NULL;"
+    },
+    {
+      "id": 12,
+      "cat": "Exploration",
+      "q": "Find the total number of customers per city.",
+      "difficulty": "Beginner",
+      "sol": "SELECT city, COUNT(*) AS count\nFROM customers_raw\nGROUP BY city\nORDER BY count DESC;"
+    },
+    {
+      "id": 13,
+      "cat": "Exploration",
+      "q": "List all unique states in the dataset.",
+      "difficulty": "Beginner",
+      "sol": "SELECT DISTINCT state\nFROM customers_raw\nORDER BY state;"
+    },
+    {
+      "id": 14,
+      "cat": "Exploration",
+      "q": "Count how many customers have notes.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS has_notes\nFROM customers_raw\nWHERE notes IS NOT NULL\n  AND TRIM(notes) != '';"
+    },
+    {
+      "id": 15,
+      "cat": "Exploration",
+      "q": "Show first 5 rows of customers_raw.",
+      "difficulty": "Beginner",
+      "sol": "SELECT *\nFROM customers_raw\nLIMIT 5;"
+    },
+    {
+      "id": 16,
+      "cat": "Exploration",
+      "q": "Count customers per customer_segment.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_segment, COUNT(*) AS total\nFROM customers_raw\nGROUP BY customer_segment\nORDER BY total DESC;"
+    },
+    {
+      "id": 17,
+      "cat": "Exploration",
+      "q": "Show all column names and sample values.",
+      "difficulty": "Beginner",
+      "sol": "SELECT column_name, data_type\nFROM information_schema.columns\nWHERE table_name = 'customers_raw';"
+    },
+    {
+      "id": 18,
+      "cat": "Exploration",
+      "q": "Find the minimum and maximum customer_id.",
+      "difficulty": "Beginner",
+      "sol": "SELECT MIN(customer_id) AS min_id,\n       MAX(customer_id) AS max_id\nFROM customers_raw;"
+    },
+    {
+      "id": 19,
+      "cat": "Exploration",
+      "q": "Count customers with is_active as 'yes'.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS active_count\nFROM customers_raw\nWHERE LOWER(is_active) = 'yes';"
+    },
+    {
+      "id": 20,
+      "cat": "Exploration",
+      "q": "Find customers registered in the year 2020.",
+      "difficulty": "Beginner",
+      "sol": "SELECT *\nFROM customers_raw\nWHERE registration_date LIKE '2020%';"
+    },
+    {
+      "id": 21,
+      "cat": "Duplicates",
+      "q": "Find duplicate rows (fully identical).",
+      "difficulty": "Intermediate",
+      "sol": "SELECT *, COUNT(*) AS dup_count\nFROM customers_raw\nGROUP BY customer_id, first_name, last_name, email, phone\nHAVING COUNT(*) > 1;"
+    },
+    {
+      "id": 22,
+      "cat": "Duplicates",
+      "q": "Find duplicate customer_id values.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id, COUNT(*) AS count\nFROM customers_raw\nGROUP BY customer_id\nHAVING COUNT(*) > 1\nORDER BY count DESC;"
+    },
+    {
+      "id": 23,
+      "cat": "Duplicates",
+      "q": "Count total number of duplicate customers.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) - COUNT(DISTINCT customer_id) AS duplicate_count\nFROM customers_raw;"
+    },
+    {
+      "id": 24,
+      "cat": "Duplicates",
+      "q": "Remove duplicate records keeping one copy.",
+      "difficulty": "Intermediate",
+      "sol": "DELETE FROM customers_raw\nWHERE ctid NOT IN (\n  SELECT MIN(ctid)\n  FROM customers_raw\n  GROUP BY customer_id\n);"
+    },
+    {
+      "id": 25,
+      "cat": "Duplicates",
+      "q": "Keep only the latest record for each duplicate customer_id.",
+      "difficulty": "Intermediate",
+      "sol": "DELETE FROM customers_raw\nWHERE ctid NOT IN (\n  SELECT MAX(ctid)\n  FROM customers_raw\n  GROUP BY customer_id\n);"
+    },
+    {
+      "id": 26,
+      "cat": "Duplicates",
+      "q": "Delete duplicates using ROW_NUMBER window function.",
+      "difficulty": "Advanced",
+      "sol": "WITH cte AS (\n  SELECT ctid,\n    ROW_NUMBER() OVER (\n      PARTITION BY customer_id\n      ORDER BY ctid\n    ) AS rn\n  FROM customers_raw\n)\nDELETE FROM customers_raw\nWHERE ctid IN (\n  SELECT ctid FROM cte WHERE rn > 1\n);"
+    },
+    {
+      "id": 27,
+      "cat": "Duplicates",
+      "q": "Identify duplicates based on email address.",
+      "difficulty": "Beginner",
+      "sol": "SELECT email, COUNT(*) AS count\nFROM customers_raw\nGROUP BY email\nHAVING COUNT(*) > 1\nORDER BY count DESC;"
+    },
+    {
+      "id": 28,
+      "cat": "Duplicates",
+      "q": "Find duplicate phone numbers.",
+      "difficulty": "Beginner",
+      "sol": "SELECT phone, COUNT(*) AS count\nFROM customers_raw\nWHERE phone IS NOT NULL\nGROUP BY phone\nHAVING COUNT(*) > 1;"
+    },
+    {
+      "id": 29,
+      "cat": "Duplicates",
+      "q": "Count total duplicate emails.",
+      "difficulty": "Beginner",
+      "sol": "SELECT COUNT(*) AS dup_email_count\nFROM (\n  SELECT email\n  FROM customers_raw\n  GROUP BY email\n  HAVING COUNT(*) > 1\n) sub;"
+    },
+    {
+      "id": 30,
+      "cat": "Duplicates",
+      "q": "Remove duplicates using DISTINCT.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT DISTINCT ON (customer_id) *\nFROM customers_raw\nORDER BY customer_id, ctid;"
+    },
+    {
+      "id": 31,
+      "cat": "Duplicates",
+      "q": "Create a clean table without duplicates.",
+      "difficulty": "Intermediate",
+      "sol": "CREATE TABLE customers_no_dupes AS\nSELECT DISTINCT ON (customer_id) *\nFROM customers_raw\nORDER BY customer_id, ctid;"
+    },
+    {
+      "id": 32,
+      "cat": "Duplicates",
+      "q": "Find duplicates with same name AND email.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT first_name, last_name, email, COUNT(*) AS cnt\nFROM customers_raw\nGROUP BY first_name, last_name, email\nHAVING COUNT(*) > 1;"
+    },
+    {
+      "id": 33,
+      "cat": "Duplicates",
+      "q": "Detect partial duplicates (same customer_id, different data).",
+      "difficulty": "Intermediate",
+      "sol": "SELECT customer_id, COUNT(DISTINCT email) AS emails, COUNT(*) AS rows\nFROM customers_raw\nGROUP BY customer_id\nHAVING COUNT(*) > 1;"
+    },
+    {
+      "id": 34,
+      "cat": "Duplicates",
+      "q": "Find customers duplicated more than twice.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id, COUNT(*) AS count\nFROM customers_raw\nGROUP BY customer_id\nHAVING COUNT(*) > 2;"
+    },
+    {
+      "id": 35,
+      "cat": "Duplicates",
+      "q": "Show all duplicate records ordered by customer_id.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE customer_id IN (\n  SELECT customer_id FROM customers_raw\n  GROUP BY customer_id HAVING COUNT(*) > 1\n)\nORDER BY customer_id, ctid;"
+    },
+    {
+      "id": 36,
+      "cat": "Duplicates",
+      "q": "Find duplicate state entries.",
+      "difficulty": "Beginner",
+      "sol": "SELECT state, COUNT(*) AS count\nFROM customers_raw\nGROUP BY state\nHAVING COUNT(*) > 1\nORDER BY count DESC;"
+    },
+    {
+      "id": 37,
+      "cat": "Duplicates",
+      "q": "Identify duplicate addresses.",
+      "difficulty": "Beginner",
+      "sol": "SELECT address, COUNT(*) AS count\nFROM customers_raw\nWHERE address IS NOT NULL\nGROUP BY address\nHAVING COUNT(*) > 1;"
+    },
+    {
+      "id": 38,
+      "cat": "Duplicates",
+      "q": "Remove duplicates using a CTE.",
+      "difficulty": "Advanced",
+      "sol": "WITH cte AS (\n  SELECT ctid,\n    ROW_NUMBER() OVER(\n      PARTITION BY customer_id\n      ORDER BY ctid\n    ) AS rn\n  FROM customers_raw\n)\nDELETE FROM customers_raw\nWHERE ctid IN (SELECT ctid FROM cte WHERE rn > 1);"
+    },
+    {
+      "id": 39,
+      "cat": "Duplicates",
+      "q": "Find duplicates using GROUP BY + HAVING.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id, COUNT(*) AS cnt\nFROM customers_raw\nGROUP BY customer_id\nHAVING COUNT(*) > 1\nORDER BY cnt DESC;"
+    },
+    {
+      "id": 40,
+      "cat": "Duplicates",
+      "q": "Keep only the first occurrence of each customer.",
+      "difficulty": "Advanced",
+      "sol": "DELETE FROM customers_raw a\nUSING customers_raw b\nWHERE a.ctid > b.ctid\n  AND a.customer_id = b.customer_id;"
+    },
+    {
+      "id": 41,
+      "cat": "String Cleaning",
+      "q": "Remove leading spaces from the notes column.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET notes = LTRIM(notes)\nWHERE notes IS NOT NULL;"
+    },
+    {
+      "id": 42,
+      "cat": "String Cleaning",
+      "q": "Remove trailing spaces from the notes column.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET notes = RTRIM(notes)\nWHERE notes IS NOT NULL;"
+    },
+    {
+      "id": 43,
+      "cat": "String Cleaning",
+      "q": "Convert email column to lowercase.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET email = LOWER(TRIM(email))\nWHERE email IS NOT NULL;"
+    },
+    {
+      "id": 44,
+      "cat": "String Cleaning",
+      "q": "Convert first_name to proper case (Title Case).",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET first_name = INITCAP(TRIM(first_name))\nWHERE first_name IS NOT NULL;"
+    },
+    {
+      "id": 45,
+      "cat": "String Cleaning",
+      "q": "Convert last_name to proper case (Title Case).",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET last_name = INITCAP(TRIM(last_name))\nWHERE last_name IS NOT NULL;"
+    },
+    {
+      "id": 46,
+      "cat": "String Cleaning",
+      "q": "Remove extra spaces from the address column.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT REGEXP_REPLACE(TRIM(address), '\\s+', ' ', 'g') AS clean_address\nFROM customers_raw;"
+    },
+    {
+      "id": 47,
+      "cat": "String Cleaning",
+      "q": "Replace multiple consecutive spaces with a single space.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET address = REGEXP_REPLACE(TRIM(address), '\\s+', ' ', 'g')\nWHERE address IS NOT NULL;"
+    },
+    {
+      "id": 48,
+      "cat": "String Cleaning",
+      "q": "Extract the email domain from each email.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT email,\n  SUBSTRING(email FROM POSITION('@' IN email) + 1) AS domain\nFROM customers_raw\nWHERE email LIKE '%@%';"
+    },
+    {
+      "id": 49,
+      "cat": "String Cleaning",
+      "q": "Remove all special characters from phone numbers.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT phone,\n  REGEXP_REPLACE(phone, '[^0-9]', '', 'g') AS digits_only\nFROM customers_raw;"
+    },
+    {
+      "id": 50,
+      "cat": "String Cleaning",
+      "q": "Replace dots with dashes in phone numbers.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET phone = REPLACE(phone, '.', '-')\nWHERE phone LIKE '%.%';"
+    },
+    {
+      "id": 51,
+      "cat": "String Cleaning",
+      "q": "Standardize phone numbers to (XXX) XXX-XXXX format.",
+      "difficulty": "Advanced",
+      "sol": "UPDATE customers_raw\nSET phone = '(' || SUBSTR(d,1,3) || ') ' || SUBSTR(d,4,3) || '-' || SUBSTR(d,7,4)\nFROM (\n  SELECT ctid,\n    REGEXP_REPLACE(phone,'[^0-9]','','g') AS d\n  FROM customers_raw\n) sub\nWHERE customers_raw.ctid = sub.ctid\n  AND LENGTH(sub.d) = 10;"
+    },
+    {
+      "id": 52,
+      "cat": "String Cleaning",
+      "q": "Remove all whitespace characters from email.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET email = REPLACE(email, ' ', '')\nWHERE email LIKE '% %';"
+    },
+    {
+      "id": 53,
+      "cat": "String Cleaning",
+      "q": "Trim leading and trailing spaces from customer_segment.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET customer_segment = TRIM(customer_segment)\nWHERE customer_segment != TRIM(COALESCE(customer_segment,''));"
+    },
+    {
+      "id": 54,
+      "cat": "String Cleaning",
+      "q": "Convert state abbreviations to uppercase.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET state = UPPER(TRIM(state))\nWHERE state IS NOT NULL;"
+    },
+    {
+      "id": 55,
+      "cat": "String Cleaning",
+      "q": "Convert city names to proper (Title) case.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET city = INITCAP(LOWER(TRIM(city)))\nWHERE city IS NOT NULL;"
+    },
+    {
+      "id": 56,
+      "cat": "String Cleaning",
+      "q": "Remove rows where notes is only blank spaces.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET notes = NULL\nWHERE TRIM(notes) = '';"
+    },
+    {
+      "id": 57,
+      "cat": "String Cleaning",
+      "q": "Replace all empty string fields with NULL.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw SET\n  first_name = NULLIF(TRIM(first_name), ''),\n  last_name  = NULLIF(TRIM(last_name), ''),\n  email      = NULLIF(TRIM(email), ''),\n  phone      = NULLIF(TRIM(phone), ''),\n  notes      = NULLIF(TRIM(notes), '');"
+    },
+    {
+      "id": 58,
+      "cat": "String Cleaning",
+      "q": "Extract the area code from 10-digit phone numbers.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT phone,\n  SUBSTRING(REGEXP_REPLACE(phone,'[^0-9]','','g'), 1, 3) AS area_code\nFROM customers_raw\nWHERE LENGTH(REGEXP_REPLACE(phone,'[^0-9]','','g')) = 10;"
+    },
+    {
+      "id": 59,
+      "cat": "String Cleaning",
+      "q": "Remove all spaces from phone numbers.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET phone = REPLACE(phone, ' ', '')\nWHERE phone LIKE '% %';"
+    },
+    {
+      "id": 60,
+      "cat": "String Cleaning",
+      "q": "Clean trailing spaces from 'Needs attention' in notes.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET notes = RTRIM(notes)\nWHERE notes ILIKE '%Needs attention%';"
+    },
+    {
+      "id": 61,
+      "cat": "Standardization",
+      "q": "Standardize 'yes'/'Yes'/'YES' all to 'Yes' in is_active.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET is_active = 'Yes'\nWHERE LOWER(is_active) = 'yes';"
+    },
+    {
+      "id": 62,
+      "cat": "Standardization",
+      "q": "Fully normalize is_active to 'Yes' or 'No'.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET is_active = CASE\n  WHEN LOWER(is_active) IN ('yes','true','y','1') THEN 'Yes'\n  WHEN LOWER(is_active) IN ('no','false','n','0')  THEN 'No'\n  ELSE NULL\nEND;"
+    },
+    {
+      "id": 63,
+      "cat": "Standardization",
+      "q": "Replace 'Y' with 'Yes' in is_active column.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET is_active = 'Yes'\nWHERE is_active = 'Y';"
+    },
+    {
+      "id": 64,
+      "cat": "Standardization",
+      "q": "Replace 'N' with 'No' in is_active column.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET is_active = 'No'\nWHERE is_active = 'N';"
+    },
+    {
+      "id": 65,
+      "cat": "Standardization",
+      "q": "Convert TRUE/FALSE string values to Yes/No.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET is_active = CASE\n  WHEN LOWER(is_active) = 'true'  THEN 'Yes'\n  WHEN LOWER(is_active) = 'false' THEN 'No'\n  ELSE is_active\nEND;"
+    },
+    {
+      "id": 66,
+      "cat": "Standardization",
+      "q": "Replace 'Invalid' in customer_segment with NULL.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET customer_segment = NULL\nWHERE customer_segment = 'Invalid';"
+    },
+    {
+      "id": 67,
+      "cat": "Standardization",
+      "q": "List all non-standard is_active values.",
+      "difficulty": "Beginner",
+      "sol": "SELECT DISTINCT is_active, COUNT(*) AS count\nFROM customers_raw\nGROUP BY is_active\nORDER BY count DESC;"
+    },
+    {
+      "id": 68,
+      "cat": "Standardization",
+      "q": "Clean zip codes to 5-digit numeric format.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT zip_code,\n  LPAD(REGEXP_REPLACE(zip_code,'[^0-9]','','g'), 5, '0') AS clean_zip\nFROM customers_raw;"
+    },
+    {
+      "id": 69,
+      "cat": "Standardization",
+      "q": "Remove newline characters from the address column.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET address = REPLACE(REPLACE(address, E'\\n', ' '), E'\\r', ' ')\nWHERE address LIKE '%\n%' OR address LIKE '%\r%';"
+    },
+    {
+      "id": 70,
+      "cat": "Standardization",
+      "q": "Remove double quotes from any text field.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET\n  first_name = REPLACE(first_name, '\"', ''),\n  last_name  = REPLACE(last_name,  '\"', ''),\n  address    = REPLACE(address,    '\"', '');"
+    },
+    {
+      "id": 71,
+      "cat": "Date Cleaning",
+      "q": "Convert birth_date VARCHAR to proper DATE format.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id, birth_date,\n  CASE\n    WHEN birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n      THEN TO_DATE(birth_date, 'YYYY-MM-DD')\n    WHEN birth_date ~ '^\\d{2}/\\d{2}/\\d{4}$'\n      THEN TO_DATE(birth_date, 'MM/DD/YYYY')\n    ELSE NULL\n  END AS clean_birth_date\nFROM customers_raw;"
+    },
+    {
+      "id": 72,
+      "cat": "Date Cleaning",
+      "q": "Fix date in format 06/15/1990 to ISO format.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT TO_DATE('06/15/1990', 'MM/DD/YYYY') AS iso_date;\n-- For the table:\nSELECT customer_id,\n  TO_DATE(birth_date, 'MM/DD/YYYY') AS fixed_date\nFROM customers_raw\nWHERE birth_date ~ '^\\d{2}/\\d{2}/\\d{4}$';"
+    },
+    {
+      "id": 73,
+      "cat": "Date Cleaning",
+      "q": "Detect the invalid date '1995-22-10' (month 22).",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND (\n    SPLIT_PART(birth_date,'-',2)::INT NOT BETWEEN 1 AND 12\n    OR SPLIT_PART(birth_date,'-',3)::INT NOT BETWEEN 1 AND 31\n  );"
+    },
+    {
+      "id": 74,
+      "cat": "Date Cleaning",
+      "q": "Convert registration_date to proper DATE type.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT customer_id,\n  TO_DATE(registration_date, 'YYYY-MM-DD') AS reg_date\nFROM customers_raw\nWHERE registration_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 75,
+      "cat": "Date Cleaning",
+      "q": "Convert last_purchase_date to DATE type.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT customer_id,\n  TO_DATE(last_purchase_date, 'YYYY-MM-DD') AS purchase_date\nFROM customers_raw\nWHERE last_purchase_date IS NOT NULL\n  AND last_purchase_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 76,
+      "cat": "Date Cleaning",
+      "q": "Find all records with dates not in YYYY-MM-DD format.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date IS NOT NULL\n  AND birth_date !~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 77,
+      "cat": "Date Cleaning",
+      "q": "Replace all invalid birth_dates with NULL.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET birth_date = NULL\nWHERE birth_date IS NOT NULL\n  AND (\n    birth_date !~ '^\\d{4}-\\d{2}-\\d{2}$'\n    OR SPLIT_PART(birth_date,'-',2)::INT > 12\n  );"
+    },
+    {
+      "id": 78,
+      "cat": "Date Cleaning",
+      "q": "Find customers older than 60 using birth_date.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT customer_id, first_name, birth_date,\n  EXTRACT(YEAR FROM AGE(TO_DATE(birth_date,'YYYY-MM-DD'))) AS age\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND EXTRACT(YEAR FROM AGE(TO_DATE(birth_date,'YYYY-MM-DD'))) > 60;"
+    },
+    {
+      "id": 79,
+      "cat": "Date Cleaning",
+      "q": "Calculate each customer's age from birth_date.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT first_name, birth_date,\n  EXTRACT(YEAR FROM\n    AGE(CURRENT_DATE, TO_DATE(birth_date,'YYYY-MM-DD'))\n  )::INT AS calculated_age\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 80,
+      "cat": "Date Cleaning",
+      "q": "Compare the stored age column vs calculated age from birth_date.",
+      "difficulty": "Advanced",
+      "sol": "SELECT first_name,\n  age::INT AS stored_age,\n  EXTRACT(YEAR FROM AGE(TO_DATE(birth_date,'YYYY-MM-DD')))::INT AS calc_age,\n  CASE\n    WHEN age::INT != EXTRACT(YEAR FROM AGE(TO_DATE(birth_date,'YYYY-MM-DD')))::INT\n    THEN 'MISMATCH' ELSE 'OK'\n  END AS status\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND age ~ '^[0-9]+$';"
+    },
+    {
+      "id": 81,
+      "cat": "Date Cleaning",
+      "q": "Find records where stored age does not match calculated age.",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM (\n  SELECT first_name, age::INT AS stored,\n    EXTRACT(YEAR FROM AGE(TO_DATE(birth_date,'YYYY-MM-DD')))::INT AS calc\n  FROM customers_raw\n  WHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n    AND age ~ '^[0-9]+$'\n) t WHERE stored != calc;"
+    },
+    {
+      "id": 82,
+      "cat": "Date Cleaning",
+      "q": "Find customers registered before year 2020.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE registration_date < '2020-01-01';"
+    },
+    {
+      "id": 83,
+      "cat": "Date Cleaning",
+      "q": "Find customers registered after year 2022.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE registration_date > '2022-12-31';"
+    },
+    {
+      "id": 84,
+      "cat": "Date Cleaning",
+      "q": "Find customers with a missing purchase date.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id, first_name, last_name\nFROM customers_raw\nWHERE last_purchase_date IS NULL;"
+    },
+    {
+      "id": 85,
+      "cat": "Date Cleaning",
+      "q": "Calculate days since each customer's last purchase.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT first_name, last_purchase_date,\n  CURRENT_DATE - TO_DATE(last_purchase_date,'YYYY-MM-DD') AS days_since\nFROM customers_raw\nWHERE last_purchase_date IS NOT NULL\n  AND last_purchase_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 86,
+      "cat": "Date Cleaning",
+      "q": "Find customers who have been inactive for more than 1 year.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE last_purchase_date IS NOT NULL\n  AND TO_DATE(last_purchase_date,'YYYY-MM-DD')\n      < CURRENT_DATE - INTERVAL '1 year';"
+    },
+    {
+      "id": 87,
+      "cat": "Date Cleaning",
+      "q": "Find customers who registered in year 2023.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE registration_date LIKE '2023%';"
+    },
+    {
+      "id": 88,
+      "cat": "Date Cleaning",
+      "q": "Extract the year from registration_date.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id,\n  EXTRACT(YEAR FROM TO_DATE(registration_date,'YYYY-MM-DD')) AS reg_year\nFROM customers_raw\nWHERE registration_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 89,
+      "cat": "Date Cleaning",
+      "q": "Extract the month from registration_date.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id,\n  EXTRACT(MONTH FROM TO_DATE(registration_date,'YYYY-MM-DD')) AS reg_month\nFROM customers_raw\nWHERE registration_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 90,
+      "cat": "Date Cleaning",
+      "q": "Extract the day from birth_date.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id,\n  EXTRACT(DAY FROM TO_DATE(birth_date,'YYYY-MM-DD')) AS birth_day\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 91,
+      "cat": "Date Cleaning",
+      "q": "Convert all date columns to ISO 8601 format.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id,\n  TO_CHAR(TO_DATE(birth_date,'YYYY-MM-DD'),'YYYY-MM-DD') AS iso_birth,\n  TO_CHAR(TO_DATE(registration_date,'YYYY-MM-DD'),'YYYY-MM-DD') AS iso_reg\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 92,
+      "cat": "Date Cleaning",
+      "q": "Replace invalid last_purchase_date with NULL.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET last_purchase_date = NULL\nWHERE last_purchase_date IS NOT NULL\n  AND last_purchase_date !~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 93,
+      "cat": "Date Cleaning",
+      "q": "Find customers who made a purchase BEFORE their registration.",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE last_purchase_date IS NOT NULL\n  AND registration_date IS NOT NULL\n  AND TO_DATE(last_purchase_date,'YYYY-MM-DD')\n    < TO_DATE(registration_date,'YYYY-MM-DD');"
+    },
+    {
+      "id": 94,
+      "cat": "Date Cleaning",
+      "q": "Detect future dates (dates after today) in birth_date.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND TO_DATE(birth_date,'YYYY-MM-DD') > CURRENT_DATE;"
+    },
+    {
+      "id": 95,
+      "cat": "Date Cleaning",
+      "q": "Fix inconsistent date formats in birth_date column.",
+      "difficulty": "Advanced",
+      "sol": "UPDATE customers_raw\nSET birth_date = TO_CHAR(\n  CASE\n    WHEN birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$' THEN TO_DATE(birth_date,'YYYY-MM-DD')\n    WHEN birth_date ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN TO_DATE(birth_date,'MM/DD/YYYY')\n    ELSE NULL\n  END, 'YYYY-MM-DD'\n);"
+    },
+    {
+      "id": 96,
+      "cat": "Date Cleaning",
+      "q": "Find customers born before 1980.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND birth_date < '1980-01-01';"
+    },
+    {
+      "id": 97,
+      "cat": "Date Cleaning",
+      "q": "Count customers grouped by birth year.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT EXTRACT(YEAR FROM TO_DATE(birth_date,'YYYY-MM-DD')) AS birth_year,\n       COUNT(*) AS count\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\nGROUP BY birth_year\nORDER BY birth_year;"
+    },
+    {
+      "id": 98,
+      "cat": "Date Cleaning",
+      "q": "Find the youngest customer.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\nORDER BY TO_DATE(birth_date,'YYYY-MM-DD') DESC\nLIMIT 1;"
+    },
+    {
+      "id": 99,
+      "cat": "Date Cleaning",
+      "q": "Find the oldest customer.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\nORDER BY TO_DATE(birth_date,'YYYY-MM-DD') ASC\nLIMIT 1;"
+    },
+    {
+      "id": 100,
+      "cat": "Date Cleaning",
+      "q": "Calculate the average customer age.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT ROUND(AVG(\n  EXTRACT(YEAR FROM AGE(TO_DATE(birth_date,'YYYY-MM-DD')))\n), 1) AS avg_age\nFROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 101,
+      "cat": "Numeric",
+      "q": "Convert the income column from VARCHAR to NUMERIC.",
+      "difficulty": "Advanced",
+      "sol": "SELECT\n  CASE\n    WHEN income ILIKE '%K'\n      THEN (REPLACE(UPPER(income),'K',''))::NUMERIC * 1000\n    WHEN income ~ '^-?[0-9]+(\\.[0-9]+)?$'\n      THEN income::NUMERIC\n    ELSE NULL\n  END AS income_numeric\nFROM customers_raw;"
+    },
+    {
+      "id": 102,
+      "cat": "Numeric",
+      "q": "Remove the letter K from income values.",
+      "difficulty": "Beginner",
+      "sol": "SELECT income,\n  REPLACE(UPPER(income), 'K', '') AS income_no_k\nFROM customers_raw\nWHERE income ILIKE '%K';"
+    },
+    {
+      "id": 103,
+      "cat": "Numeric",
+      "q": "Convert '120K' to 120000 numerically.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET income = ((REPLACE(UPPER(income),'K',''))::NUMERIC * 1000)::TEXT\nWHERE income ILIKE '%K';"
+    },
+    {
+      "id": 104,
+      "cat": "Numeric",
+      "q": "Replace negative income values with NULL.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET income = NULL\nWHERE income ~ '^-[0-9]+';"
+    },
+    {
+      "id": 105,
+      "cat": "Numeric",
+      "q": "Find and flag customers with income = 0.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE income = '0';"
+    },
+    {
+      "id": 106,
+      "cat": "Numeric",
+      "q": "Convert total_purchases to integer type.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT customer_id,\n  CAST(total_purchases AS INTEGER) AS purchases_int\nFROM customers_raw\nWHERE total_purchases ~ '^-?[0-9]+$';"
+    },
+    {
+      "id": 107,
+      "cat": "Numeric",
+      "q": "Replace negative total_purchases with 0.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET total_purchases = '0'\nWHERE total_purchases ~ '^-[0-9]+$';"
+    },
+    {
+      "id": 108,
+      "cat": "Numeric",
+      "q": "Replace NULL total_purchases with 0.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET total_purchases = '0'\nWHERE total_purchases IS NULL;"
+    },
+    {
+      "id": 109,
+      "cat": "Numeric",
+      "q": "Calculate the average income (handling K suffix).",
+      "difficulty": "Advanced",
+      "sol": "SELECT ROUND(AVG(\n  CASE\n    WHEN income ILIKE '%K'\n      THEN (REPLACE(UPPER(income),'K',''))::NUMERIC * 1000\n    WHEN income ~ '^[0-9]+$'\n      THEN income::NUMERIC\n    ELSE NULL\n  END\n), 2) AS avg_income\nFROM customers_raw;"
+    },
+    {
+      "id": 110,
+      "cat": "Numeric",
+      "q": "Find customers with numeric income greater than 100000.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE income ~ '^[0-9]+$'\n  AND income::NUMERIC > 100000;"
+    },
+    {
+      "id": 111,
+      "cat": "Numeric",
+      "q": "Find the top 5 customers by income.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT first_name, last_name, income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$'\nORDER BY income::NUMERIC DESC\nLIMIT 5;"
+    },
+    {
+      "id": 112,
+      "cat": "Numeric",
+      "q": "Find the minimum income value.",
+      "difficulty": "Beginner",
+      "sol": "SELECT MIN(income::NUMERIC) AS min_income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$';"
+    },
+    {
+      "id": 113,
+      "cat": "Numeric",
+      "q": "Find the maximum income value.",
+      "difficulty": "Beginner",
+      "sol": "SELECT MAX(income::NUMERIC) AS max_income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$';"
+    },
+    {
+      "id": 114,
+      "cat": "Numeric",
+      "q": "Find the median income using PERCENTILE_CONT.",
+      "difficulty": "Advanced",
+      "sol": "SELECT PERCENTILE_CONT(0.5)\n  WITHIN GROUP (ORDER BY income::NUMERIC) AS median_income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$';"
+    },
+    {
+      "id": 115,
+      "cat": "Numeric",
+      "q": "Show average income grouped by customer_segment.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT customer_segment,\n  ROUND(AVG(income::NUMERIC), 2) AS avg_income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$'\nGROUP BY customer_segment\nORDER BY avg_income DESC;"
+    },
+    {
+      "id": 116,
+      "cat": "Numeric",
+      "q": "Find the average total_purchases per customer.",
+      "difficulty": "Beginner",
+      "sol": "SELECT ROUND(AVG(total_purchases::NUMERIC), 2) AS avg_purchases\nFROM customers_raw\nWHERE total_purchases ~ '^[0-9]+$';"
+    },
+    {
+      "id": 117,
+      "cat": "Numeric",
+      "q": "Find customers with more than 20 total purchases.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE total_purchases ~ '^[0-9]+$'\n  AND total_purchases::INT > 20;"
+    },
+    {
+      "id": 118,
+      "cat": "Numeric",
+      "q": "Find customers with zero total purchases.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE total_purchases = '0';"
+    },
+    {
+      "id": 119,
+      "cat": "Numeric",
+      "q": "Calculate purchase frequency as purchases per year since registration.",
+      "difficulty": "Advanced",
+      "sol": "SELECT first_name,\n  total_purchases::NUMERIC /\n  NULLIF(EXTRACT(YEAR FROM AGE(TO_DATE(registration_date,'YYYY-MM-DD'))),0) AS freq_per_year\nFROM customers_raw\nWHERE total_purchases ~ '^[0-9]+$'\n  AND registration_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 120,
+      "cat": "Numeric",
+      "q": "Calculate the sum of all total_purchases.",
+      "difficulty": "Beginner",
+      "sol": "SELECT SUM(total_purchases::NUMERIC) AS grand_total\nFROM customers_raw\nWHERE total_purchases ~ '^[0-9]+$';"
+    },
+    {
+      "id": 121,
+      "cat": "Numeric",
+      "q": "Normalize income values to a 0-1 scale.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id, income,\n  ROUND(\n    (income::NUMERIC - MIN(income::NUMERIC) OVER()) /\n    NULLIF(MAX(income::NUMERIC) OVER() - MIN(income::NUMERIC) OVER(), 0)\n  , 4) AS normalized_income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$';"
+    },
+    {
+      "id": 122,
+      "cat": "Numeric",
+      "q": "Detect income outliers using standard deviation.",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE income ~ '^[0-9]+$'\n  AND ABS(income::NUMERIC - (\n    SELECT AVG(income::NUMERIC) FROM customers_raw WHERE income ~ '^[0-9]+$'\n  )) > 2 * (\n    SELECT STDDEV(income::NUMERIC) FROM customers_raw WHERE income ~ '^[0-9]+$'\n  );"
+    },
+    {
+      "id": 123,
+      "cat": "Numeric",
+      "q": "Replace non-numeric income values with NULL.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET income = NULL\nWHERE income IS NOT NULL\n  AND income !~ '^[0-9]+(\\.[0-9]+)?$'\n  AND income !~ '^[0-9]+K$';"
+    },
+    {
+      "id": 124,
+      "cat": "Numeric",
+      "q": "Round all numeric income values to nearest 1000.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT income,\n  ROUND(income::NUMERIC / 1000.0) * 1000 AS rounded_income\nFROM customers_raw\nWHERE income ~ '^[0-9]+$';"
+    },
+    {
+      "id": 125,
+      "cat": "Numeric",
+      "q": "Cast the age column to integer.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id,\n  CAST(age AS INTEGER) AS age_int\nFROM customers_raw\nWHERE age ~ '^[0-9]+$';"
+    },
+    {
+      "id": 126,
+      "cat": "Numeric",
+      "q": "Detect invalid (non-numeric) values in total_purchases.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE total_purchases IS NOT NULL\n  AND total_purchases !~ '^-?[0-9]+$';"
+    },
+    {
+      "id": 127,
+      "cat": "Numeric",
+      "q": "Handle NULL numeric fields using COALESCE.",
+      "difficulty": "Beginner",
+      "sol": "SELECT customer_id,\n  COALESCE(NULLIF(income,''), '0') AS income,\n  COALESCE(NULLIF(total_purchases,''), '0') AS total_purchases\nFROM customers_raw;"
+    },
+    {
+      "id": 128,
+      "cat": "Numeric",
+      "q": "Replace blank numeric fields with 0.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET total_purchases = '0'\nWHERE TRIM(COALESCE(total_purchases,'')) = '';"
+    },
+    {
+      "id": 129,
+      "cat": "Numeric",
+      "q": "Detect unrealistic ages (below 0 or above 120).",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE age ~ '^[0-9]+$'\n  AND (age::INT < 0 OR age::INT > 120);"
+    },
+    {
+      "id": 130,
+      "cat": "Numeric",
+      "q": "Set age to NULL where it falls outside 18-100.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET age = NULL\nWHERE age ~ '^[0-9]+$'\n  AND (age::INT < 18 OR age::INT > 100);"
+    },
+    {
+      "id": 131,
+      "cat": "NULL Handling",
+      "q": "Count the number of NULL values in every column.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT\n  COUNT(*)-COUNT(customer_id)     AS null_id,\n  COUNT(*)-COUNT(first_name)      AS null_first,\n  COUNT(*)-COUNT(last_name)       AS null_last,\n  COUNT(*)-COUNT(email)           AS null_email,\n  COUNT(*)-COUNT(phone)           AS null_phone,\n  COUNT(*)-COUNT(income)          AS null_income,\n  COUNT(*)-COUNT(birth_date)      AS null_birth,\n  COUNT(*)-COUNT(last_purchase_date) AS null_purchase\nFROM customers_raw;"
+    },
+    {
+      "id": 132,
+      "cat": "NULL Handling",
+      "q": "Replace NULL phone numbers with 'Not Provided'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET phone = 'Not Provided'\nWHERE phone IS NULL;"
+    },
+    {
+      "id": 133,
+      "cat": "NULL Handling",
+      "q": "Replace NULL total_purchases with 0.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET total_purchases = '0'\nWHERE total_purchases IS NULL;"
+    },
+    {
+      "id": 134,
+      "cat": "NULL Handling",
+      "q": "Replace NULL or empty notes with 'No notes'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET notes = 'No notes'\nWHERE notes IS NULL OR TRIM(notes) = '';"
+    },
+    {
+      "id": 135,
+      "cat": "NULL Handling",
+      "q": "Replace NULL income with the column average.",
+      "difficulty": "Advanced",
+      "sol": "UPDATE customers_raw\nSET income = (\n  SELECT ROUND(AVG(income::NUMERIC))::TEXT\n  FROM customers_raw\n  WHERE income ~ '^[0-9]+$'\n)\nWHERE income IS NULL;"
+    },
+    {
+      "id": 136,
+      "cat": "NULL Handling",
+      "q": "Replace missing city with 'Unknown'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET city = 'Unknown'\nWHERE city IS NULL OR TRIM(city) = '';"
+    },
+    {
+      "id": 137,
+      "cat": "NULL Handling",
+      "q": "Replace missing state with 'Unknown'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET state = 'Unknown'\nWHERE state IS NULL OR TRIM(state) = '';"
+    },
+    {
+      "id": 138,
+      "cat": "NULL Handling",
+      "q": "Replace missing last_purchase_date with a default date.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET last_purchase_date = '1900-01-01'\nWHERE last_purchase_date IS NULL;"
+    },
+    {
+      "id": 139,
+      "cat": "NULL Handling",
+      "q": "Replace NULL email with a placeholder.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET email = 'unknown@placeholder.com'\nWHERE email IS NULL OR TRIM(email) = '';"
+    },
+    {
+      "id": 140,
+      "cat": "NULL Handling",
+      "q": "Replace blank first/last names with NULL.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET\n  first_name = NULLIF(TRIM(first_name), ''),\n  last_name  = NULLIF(TRIM(last_name),  '');"
+    },
+    {
+      "id": 141,
+      "cat": "NULL Handling",
+      "q": "Fill missing age column from birth_date.",
+      "difficulty": "Advanced",
+      "sol": "UPDATE customers_raw\nSET age = EXTRACT(YEAR FROM\n  AGE(TO_DATE(birth_date,'YYYY-MM-DD'))\n)::TEXT\nWHERE (age IS NULL OR TRIM(age) = '')\n  AND birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$';"
+    },
+    {
+      "id": 142,
+      "cat": "NULL Handling",
+      "q": "Replace missing customer_segment with 'Regular'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET customer_segment = 'Regular'\nWHERE customer_segment IS NULL\n   OR customer_segment = 'Invalid'\n   OR TRIM(customer_segment) = '';"
+    },
+    {
+      "id": 143,
+      "cat": "NULL Handling",
+      "q": "Replace NULL zip_code with '00000'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET zip_code = '00000'\nWHERE zip_code IS NULL OR TRIM(zip_code) = '';"
+    },
+    {
+      "id": 144,
+      "cat": "NULL Handling",
+      "q": "Replace NULL address with 'Address Unknown'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET address = 'Address Unknown'\nWHERE address IS NULL OR TRIM(address) = '';"
+    },
+    {
+      "id": 145,
+      "cat": "NULL Handling",
+      "q": "Replace NULL is_active with 'Unknown'.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET is_active = 'Unknown'\nWHERE is_active IS NULL OR TRIM(is_active) = '';"
+    },
+    {
+      "id": 146,
+      "cat": "NULL Handling",
+      "q": "Replace missing phone with a placeholder string.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET phone = '000-000-0000'\nWHERE phone IS NULL;"
+    },
+    {
+      "id": 147,
+      "cat": "NULL Handling",
+      "q": "Replace blank email values with NULL.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET email = NULL\nWHERE TRIM(COALESCE(email,'')) = '';"
+    },
+    {
+      "id": 148,
+      "cat": "NULL Handling",
+      "q": "Fill multiple missing fields using COALESCE in a SELECT.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT\n  customer_id,\n  COALESCE(NULLIF(TRIM(first_name),''), 'Unknown')  AS first_name,\n  COALESCE(phone,                  'Not Provided') AS phone,\n  COALESCE(NULLIF(TRIM(notes),''),  'No notes')    AS notes,\n  COALESCE(NULLIF(TRIM(city),''),   'Unknown')     AS city\nFROM customers_raw;"
+    },
+    {
+      "id": 149,
+      "cat": "NULL Handling",
+      "q": "Replace NULL income with the median income.",
+      "difficulty": "Advanced",
+      "sol": "UPDATE customers_raw\nSET income = (\n  SELECT PERCENTILE_CONT(0.5)\n    WITHIN GROUP (ORDER BY income::NUMERIC)\n  FROM customers_raw WHERE income ~ '^[0-9]+$'\n)::TEXT\nWHERE income IS NULL;"
+    },
+    {
+      "id": 150,
+      "cat": "NULL Handling",
+      "q": "Count rows that have more than 3 NULL fields.",
+      "difficulty": "Advanced",
+      "sol": "SELECT COUNT(*) AS rows_with_3plus_nulls\nFROM (\n  SELECT customer_id,\n    (CASE WHEN customer_id IS NULL THEN 1 ELSE 0 END +\n     CASE WHEN first_name  IS NULL OR TRIM(first_name)='' THEN 1 ELSE 0 END +\n     CASE WHEN email       IS NULL THEN 1 ELSE 0 END +\n     CASE WHEN phone       IS NULL THEN 1 ELSE 0 END +\n     CASE WHEN income      IS NULL THEN 1 ELSE 0 END +\n     CASE WHEN birth_date  IS NULL THEN 1 ELSE 0 END) AS null_count\n  FROM customers_raw\n) t WHERE null_count > 3;"
+    },
+    {
+      "id": 151,
+      "cat": "Validation",
+      "q": "Validate email format using a regex pattern.",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE email !~ '^[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$';"
+    },
+    {
+      "id": 152,
+      "cat": "Validation",
+      "q": "Validate that phone numbers are exactly 10 digits.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE phone IS NOT NULL\n  AND LENGTH(REGEXP_REPLACE(phone,'[^0-9]','','g')) != 10;"
+    },
+    {
+      "id": 153,
+      "cat": "Validation",
+      "q": "Validate zip_code is a 5-digit number.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE zip_code IS NOT NULL\n  AND zip_code !~ '^[0-9]{5}$';"
+    },
+    {
+      "id": 154,
+      "cat": "Validation",
+      "q": "Validate age is between 18 and 100.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE age ~ '^[0-9]+$'\n  AND (age::INT < 18 OR age::INT > 100);"
+    },
+    {
+      "id": 155,
+      "cat": "Validation",
+      "q": "Validate that income is greater than 0.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE income IS NOT NULL\n  AND income ~ '^-?[0-9]+$'\n  AND income::NUMERIC <= 0;"
+    },
+    {
+      "id": 156,
+      "cat": "Validation",
+      "q": "Validate that total_purchases is >= 0.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE total_purchases IS NOT NULL\n  AND total_purchases ~ '^-?[0-9]+$'\n  AND total_purchases::INT < 0;"
+    },
+    {
+      "id": 157,
+      "cat": "Validation",
+      "q": "Validate is_active contains only allowed values.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT DISTINCT is_active FROM customers_raw\nWHERE LOWER(COALESCE(is_active,'')) NOT IN\n  ('yes','no','true','false','y','n','1','0');"
+    },
+    {
+      "id": 158,
+      "cat": "Validation",
+      "q": "Validate customer_segment is a known valid value.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT DISTINCT customer_segment\nFROM customers_raw\nWHERE customer_segment NOT IN\n  ('Regular','Premium','Gold','Platinum')\n  AND customer_segment IS NOT NULL;"
+    },
+    {
+      "id": 159,
+      "cat": "Validation",
+      "q": "Detect invalid US state abbreviations.",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE state NOT IN (\n  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',\n  'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',\n  'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',\n  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',\n  'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'\n);"
+    },
+    {
+      "id": 160,
+      "cat": "Validation",
+      "q": "Detect obviously fake city names.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT DISTINCT city FROM customers_raw\nWHERE city ILIKE '%fake%'\n   OR city ILIKE '%test%'\n   OR city ILIKE '%unknown%'\n   OR LENGTH(TRIM(city)) < 2;"
+    },
+    {
+      "id": 161,
+      "cat": "Validation",
+      "q": "Validate registration_date is before last_purchase_date.",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE registration_date IS NOT NULL\n  AND last_purchase_date IS NOT NULL\n  AND TO_DATE(last_purchase_date,'YYYY-MM-DD')\n    < TO_DATE(registration_date,'YYYY-MM-DD');"
+    },
+    {
+      "id": 162,
+      "cat": "Validation",
+      "q": "Validate that all email domains are legitimate.",
+      "difficulty": "Advanced",
+      "sol": "SELECT email,\n  SUBSTRING(email FROM POSITION('@' IN email)+1) AS domain\nFROM customers_raw\nWHERE email LIKE '%@%'\n  AND SUBSTRING(email FROM POSITION('@' IN email)+1)\n      NOT LIKE '%.%';"
+    },
+    {
+      "id": 163,
+      "cat": "Validation",
+      "q": "Check phone format matches a standard pattern.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE phone IS NOT NULL\n  AND phone !~ '^(\\(\\d{3}\\)|\\d{3})[\\s.\\-]?\\d{3}[.\\-]?\\d{4}$';"
+    },
+    {
+      "id": 164,
+      "cat": "Validation",
+      "q": "Validate birth_date is in the past.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND TO_DATE(birth_date,'YYYY-MM-DD') >= CURRENT_DATE;"
+    },
+    {
+      "id": 165,
+      "cat": "Validation",
+      "q": "Detect potentially fake addresses.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE address ILIKE '%fake%'\n   OR address ILIKE '%test%'\n   OR address ILIKE '%123 fake%';"
+    },
+    {
+      "id": 166,
+      "cat": "Validation",
+      "q": "Validate zip_code length is exactly 5.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE zip_code IS NOT NULL\n  AND LENGTH(TRIM(zip_code)) != 5;"
+    },
+    {
+      "id": 167,
+      "cat": "Validation",
+      "q": "Detect states that don't match the city.",
+      "difficulty": "Advanced",
+      "sol": "-- Simplified: check city/state combos that appear inconsistently\nSELECT city, state, COUNT(DISTINCT state) OVER (PARTITION BY city) AS state_count\nFROM customers_raw\nWHERE city IS NOT NULL;"
+    },
+    {
+      "id": 168,
+      "cat": "Validation",
+      "q": "Validate all numeric columns have valid numbers.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id,\n  CASE WHEN age ~ '^[0-9]+$' THEN 'OK' ELSE 'INVALID' END AS age_valid,\n  CASE WHEN income ~ '^[0-9]+$' OR income ILIKE '%K' THEN 'OK' ELSE 'INVALID' END AS income_valid,\n  CASE WHEN total_purchases ~ '^[0-9]+$' THEN 'OK' ELSE 'INVALID' END AS purchases_valid\nFROM customers_raw;"
+    },
+    {
+      "id": 169,
+      "cat": "Validation",
+      "q": "Detect completely empty records.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE TRIM(COALESCE(first_name,'')) = ''\n  AND TRIM(COALESCE(last_name,''))  = ''\n  AND TRIM(COALESCE(email,''))      = '';"
+    },
+    {
+      "id": 170,
+      "cat": "Validation",
+      "q": "Validate no duplicate emails exist after cleaning.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT email, COUNT(*) AS count\nFROM customers_raw\nWHERE email IS NOT NULL\nGROUP BY LOWER(TRIM(email))\nHAVING COUNT(*) > 1;"
+    },
+    {
+      "id": 171,
+      "cat": "Validation",
+      "q": "Detect inconsistent customer_segment capitalization.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT DISTINCT customer_segment\nFROM customers_raw\nWHERE customer_segment != INITCAP(LOWER(customer_segment));"
+    },
+    {
+      "id": 172,
+      "cat": "Validation",
+      "q": "Validate no emails are stored in uppercase.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE email != LOWER(email)\n  AND email IS NOT NULL;"
+    },
+    {
+      "id": 173,
+      "cat": "Validation",
+      "q": "Detect trailing spaces in any column.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE first_name != RTRIM(COALESCE(first_name,''))\n   OR last_name  != RTRIM(COALESCE(last_name,''))\n   OR notes      != RTRIM(COALESCE(notes,''));"
+    },
+    {
+      "id": 174,
+      "cat": "Validation",
+      "q": "Detect rows where both first_name and last_name are blank.",
+      "difficulty": "Beginner",
+      "sol": "SELECT * FROM customers_raw\nWHERE (first_name IS NULL OR TRIM(first_name) = '')\n  AND (last_name  IS NULL OR TRIM(last_name)  = '');"
+    },
+    {
+      "id": 175,
+      "cat": "Validation",
+      "q": "Validate registration year is between 2015 and current year.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT * FROM customers_raw\nWHERE registration_date ~ '^\\d{4}-\\d{2}-\\d{2}$'\n  AND (\n    EXTRACT(YEAR FROM TO_DATE(registration_date,'YYYY-MM-DD')) < 2015\n    OR EXTRACT(YEAR FROM TO_DATE(registration_date,'YYYY-MM-DD')) > 2026\n  );"
+    },
+    {
+      "id": 176,
+      "cat": "Final Cleaning",
+      "q": "Create a fully cleaned customers table.",
+      "difficulty": "Advanced",
+      "sol": "CREATE TABLE customers_clean AS\nSELECT DISTINCT ON (customer_id)\n  customer_id,\n  INITCAP(TRIM(first_name))       AS first_name,\n  INITCAP(TRIM(last_name))        AS last_name,\n  LOWER(TRIM(email))              AS email,\n  REGEXP_REPLACE(COALESCE(phone,''),'[^0-9]','','g') AS phone,\n  CASE\n    WHEN LOWER(is_active) IN ('yes','true','y','1') THEN 'Yes'\n    ELSE 'No'\n  END                             AS is_active,\n  COALESCE(NULLIF(TRIM(notes),''), 'No notes') AS notes\nFROM customers_raw\nWHERE email LIKE '%@%'\nORDER BY customer_id, ctid;"
+    },
+    {
+      "id": 177,
+      "cat": "Final Cleaning",
+      "q": "Standardize all phone numbers to uniform format.",
+      "difficulty": "Advanced",
+      "sol": "UPDATE customers_raw cr\nSET phone = '(' || SUBSTR(d,1,3) || ') ' || SUBSTR(d,4,3) || '-' || SUBSTR(d,7,4)\nFROM (\n  SELECT ctid,\n    REGEXP_REPLACE(phone,'[^0-9]','','g') AS d\n  FROM customers_raw\n) sub\nWHERE cr.ctid = sub.ctid AND LENGTH(sub.d) = 10;"
+    },
+    {
+      "id": 178,
+      "cat": "Final Cleaning",
+      "q": "Standardize all email addresses to lowercase.",
+      "difficulty": "Beginner",
+      "sol": "UPDATE customers_raw\nSET email = LOWER(TRIM(email))\nWHERE email IS NOT NULL\n  AND email != LOWER(TRIM(email));"
+    },
+    {
+      "id": 179,
+      "cat": "Final Cleaning",
+      "q": "Create a full_name column combining first and last name.",
+      "difficulty": "Intermediate",
+      "sol": "ALTER TABLE customers_raw ADD COLUMN IF NOT EXISTS full_name VARCHAR(200);\nUPDATE customers_raw\nSET full_name = INITCAP(TRIM(COALESCE(first_name,''))) || ' '\n  || INITCAP(TRIM(COALESCE(last_name,'')));"
+    },
+    {
+      "id": 180,
+      "cat": "Final Cleaning",
+      "q": "Split the phone number into area code and local parts.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT phone,\n  SUBSTR(REGEXP_REPLACE(phone,'[^0-9]','','g'),1,3) AS area_code,\n  SUBSTR(REGEXP_REPLACE(phone,'[^0-9]','','g'),4,3) AS exchange,\n  SUBSTR(REGEXP_REPLACE(phone,'[^0-9]','','g'),7,4) AS line_num\nFROM customers_raw\nWHERE LENGTH(REGEXP_REPLACE(phone,'[^0-9]','','g')) = 10;"
+    },
+    {
+      "id": 181,
+      "cat": "Final Cleaning",
+      "q": "Split the address into street and city parts.",
+      "difficulty": "Advanced",
+      "sol": "SELECT address,\n  SPLIT_PART(address, ',', 1) AS street,\n  TRIM(SPLIT_PART(address, ',', 2)) AS city_part\nFROM customers_raw\nWHERE address LIKE '%,%';"
+    },
+    {
+      "id": 182,
+      "cat": "Final Cleaning",
+      "q": "Create an income_category column (Low/Medium/High).",
+      "difficulty": "Intermediate",
+      "sol": "SELECT first_name, income,\n  CASE\n    WHEN income::NUMERIC > 100000 THEN 'High'\n    WHEN income::NUMERIC > 60000  THEN 'Medium'\n    ELSE 'Low'\n  END AS income_category\nFROM customers_raw\nWHERE income ~ '^[0-9]+$';"
+    },
+    {
+      "id": 183,
+      "cat": "Final Cleaning",
+      "q": "Create an age_group column (Youth/Adult/Senior).",
+      "difficulty": "Intermediate",
+      "sol": "SELECT first_name, age,\n  CASE\n    WHEN age::INT < 30 THEN 'Youth'\n    WHEN age::INT < 60 THEN 'Adult'\n    ELSE 'Senior'\n  END AS age_group\nFROM customers_raw\nWHERE age ~ '^[0-9]+$';"
+    },
+    {
+      "id": 184,
+      "cat": "Final Cleaning",
+      "q": "Flag invalid records with a has_error boolean column.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id,\n  (\n    email NOT LIKE '%@%'\n    OR (age ~ '^[0-9]+$' AND (age::INT < 0 OR age::INT > 120))\n    OR (income ~ '^-[0-9]+$')\n    OR (total_purchases ~ '^-[0-9]+$')\n  ) AS has_error\nFROM customers_raw;"
+    },
+    {
+      "id": 185,
+      "cat": "Final Cleaning",
+      "q": "Remove records that have more than 4 data errors.",
+      "difficulty": "Advanced",
+      "sol": "DELETE FROM customers_raw\nWHERE customer_id IN (\n  SELECT customer_id FROM (\n    SELECT customer_id,\n      (CASE WHEN email NOT LIKE '%@%' THEN 1 ELSE 0 END +\n       CASE WHEN first_name IS NULL OR TRIM(first_name)='' THEN 1 ELSE 0 END +\n       CASE WHEN income ~ '^-' THEN 1 ELSE 0 END +\n       CASE WHEN total_purchases ~ '^-' THEN 1 ELSE 0 END +\n       CASE WHEN phone IS NULL THEN 1 ELSE 0 END) AS errors\n    FROM customers_raw\n  ) t WHERE errors > 4\n);"
+    },
+    {
+      "id": 186,
+      "cat": "Final Cleaning",
+      "q": "Create a cleaned is_active boolean column.",
+      "difficulty": "Intermediate",
+      "sol": "ALTER TABLE customers_raw ADD COLUMN IF NOT EXISTS is_active_bool BOOLEAN;\nUPDATE customers_raw\nSET is_active_bool = CASE\n  WHEN LOWER(is_active) IN ('yes','true','y','1') THEN TRUE\n  ELSE FALSE\nEND;"
+    },
+    {
+      "id": 187,
+      "cat": "Final Cleaning",
+      "q": "Create normalized segment values column.",
+      "difficulty": "Intermediate",
+      "sol": "ALTER TABLE customers_raw ADD COLUMN IF NOT EXISTS segment_clean VARCHAR(50);\nUPDATE customers_raw\nSET segment_clean = CASE\n  WHEN customer_segment IN ('Regular','Premium','Gold','Platinum')\n    THEN customer_segment\n  ELSE 'Regular'\nEND;"
+    },
+    {
+      "id": 188,
+      "cat": "Final Cleaning",
+      "q": "Build a data quality score (0-5) for each customer.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id,\n  (\n    CASE WHEN email LIKE '%@%.%' THEN 1 ELSE 0 END +\n    CASE WHEN phone IS NOT NULL THEN 1 ELSE 0 END +\n    CASE WHEN birth_date ~ '^\\d{4}-\\d{2}-\\d{2}$' THEN 1 ELSE 0 END +\n    CASE WHEN income ~ '^[0-9]+$' THEN 1 ELSE 0 END +\n    CASE WHEN first_name IS NOT NULL AND TRIM(first_name) != '' THEN 1 ELSE 0 END\n  ) AS quality_score\nFROM customers_raw\nORDER BY quality_score DESC;"
+    },
+    {
+      "id": 189,
+      "cat": "Final Cleaning",
+      "q": "Identify incomplete records (missing 2+ core fields).",
+      "difficulty": "Advanced",
+      "sol": "SELECT * FROM customers_raw\nWHERE (\n  CASE WHEN first_name IS NULL OR TRIM(first_name)='' THEN 1 ELSE 0 END +\n  CASE WHEN email      IS NULL OR email NOT LIKE '%@%' THEN 1 ELSE 0 END +\n  CASE WHEN phone      IS NULL THEN 1 ELSE 0 END +\n  CASE WHEN income     IS NULL THEN 1 ELSE 0 END\n) >= 2;"
+    },
+    {
+      "id": 190,
+      "cat": "Final Cleaning",
+      "q": "Create an audit log table for cleaning operations.",
+      "difficulty": "Advanced",
+      "sol": "CREATE TABLE cleaning_audit (\n  audit_id   SERIAL PRIMARY KEY,\n  table_name VARCHAR(100),\n  operation  VARCHAR(50),\n  rows_affected INT,\n  performed_at TIMESTAMP DEFAULT NOW(),\n  notes TEXT\n);\nINSERT INTO cleaning_audit(table_name,operation,rows_affected,notes)\nVALUES ('customers_raw','standardize_email',\n  (SELECT COUNT(*) FROM customers_raw WHERE email != LOWER(email)),\n  'Converted emails to lowercase');"
+    },
+    {
+      "id": 191,
+      "cat": "Final Cleaning",
+      "q": "Standardize all zip_code values to 5-digit format.",
+      "difficulty": "Intermediate",
+      "sol": "UPDATE customers_raw\nSET zip_code = LPAD(\n  REGEXP_REPLACE(zip_code,'[^0-9]','','g'),\n  5, '0'\n)\nWHERE zip_code IS NOT NULL\n  AND LENGTH(REGEXP_REPLACE(zip_code,'[^0-9]','','g')) <= 5;"
+    },
+    {
+      "id": 192,
+      "cat": "Final Cleaning",
+      "q": "Detect inconsistent customer_segment values.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT DISTINCT customer_segment, COUNT(*) AS count\nFROM customers_raw\nGROUP BY customer_segment\nORDER BY count DESC;"
+    },
+    {
+      "id": 193,
+      "cat": "Final Cleaning",
+      "q": "Merge duplicate customers by combining their data.",
+      "difficulty": "Expert",
+      "sol": "INSERT INTO customers_clean\nSELECT\n  customer_id,\n  MAX(first_name) AS first_name,\n  MAX(last_name)  AS last_name,\n  MIN(email)      AS email,\n  MAX(phone)      AS phone,\n  MAX(income)     AS income,\n  MIN(registration_date) AS registration_date,\n  MAX(last_purchase_date) AS last_purchase_date,\n  SUM(COALESCE(total_purchases::INT,0)) AS total_purchases\nFROM customers_raw\nGROUP BY customer_id;"
+    },
+    {
+      "id": 194,
+      "cat": "Final Cleaning",
+      "q": "Create a VIEW of the cleaned dataset.",
+      "difficulty": "Intermediate",
+      "sol": "CREATE OR REPLACE VIEW v_customers_clean AS\nSELECT\n  customer_id,\n  INITCAP(TRIM(first_name)) AS first_name,\n  INITCAP(TRIM(last_name))  AS last_name,\n  LOWER(TRIM(email))        AS email,\n  REGEXP_REPLACE(COALESCE(phone,''),'[^0-9]','','g') AS phone_digits,\n  CASE\n    WHEN LOWER(is_active) IN ('yes','true','y','1') THEN TRUE ELSE FALSE\n  END AS is_active,\n  COALESCE(NULLIF(TRIM(notes),''),'No notes') AS notes\nFROM customers_raw\nWHERE email LIKE '%@%';"
+    },
+    {
+      "id": 195,
+      "cat": "Final Cleaning",
+      "q": "Build a complete step-by-step data cleaning pipeline.",
+      "difficulty": "Expert",
+      "sol": "-- STEP 1: Trim whitespace\nUPDATE customers_raw SET\n  first_name = TRIM(first_name),\n  last_name  = TRIM(last_name),\n  email      = LOWER(TRIM(email));\n\n-- STEP 2: Normalize is_active\nUPDATE customers_raw SET is_active = CASE\n  WHEN LOWER(is_active) IN ('yes','true','y','1') THEN 'Yes'\n  ELSE 'No'\nEND;\n\n-- STEP 3: Fix income K values\nUPDATE customers_raw\nSET income = ((REPLACE(UPPER(income),'K',''))::NUMERIC*1000)::TEXT\nWHERE income ILIKE '%K';\n\n-- STEP 4: Remove duplicates\nDELETE FROM customers_raw\nWHERE ctid NOT IN (SELECT MIN(ctid) FROM customers_raw GROUP BY customer_id);\n\n-- STEP 5: Create clean table\nCREATE TABLE customers_final AS\nSELECT * FROM customers_raw\nWHERE email LIKE '%@%';"
+    },
+    {
+      "id": 196,
+      "cat": "Final Cleaning",
+      "q": "Track which records were corrected during cleaning.",
+      "difficulty": "Advanced",
+      "sol": "SELECT customer_id,\n  CASE WHEN email != LOWER(email) THEN 'email ' ELSE '' END ||\n  CASE WHEN first_name != INITCAP(first_name) THEN 'name ' ELSE '' END ||\n  CASE WHEN income ILIKE '%K' THEN 'income ' ELSE '' END AS corrections_needed\nFROM customers_raw\nWHERE\n  email != LOWER(email)\n  OR first_name != INITCAP(COALESCE(first_name,''))\n  OR income ILIKE '%K';"
+    },
+    {
+      "id": 197,
+      "cat": "Final Cleaning",
+      "q": "Build a staging table for cleaned data.",
+      "difficulty": "Advanced",
+      "sol": "CREATE TABLE customers_staging (\n  LIKE customers_raw INCLUDING ALL\n);\nINSERT INTO customers_staging\nSELECT DISTINCT ON (customer_id)\n  customer_id,\n  INITCAP(TRIM(first_name)),\n  INITCAP(TRIM(last_name)),\n  LOWER(TRIM(email)),\n  REGEXP_REPLACE(COALESCE(phone,''),'[^0-9]','','g'),\n  birth_date, age, income, address, city,\n  UPPER(state), zip_code, registration_date,\n  last_purchase_date, total_purchases,\n  customer_segment, is_active, notes\nFROM customers_raw\nORDER BY customer_id, ctid;"
+    },
+    {
+      "id": 198,
+      "cat": "Final Cleaning",
+      "q": "Create an automated data validation query.",
+      "difficulty": "Expert",
+      "sol": "SELECT\n  'total_rows'           AS check_name, COUNT(*)::TEXT AS result FROM customers_raw\nUNION ALL\nSELECT 'null_emails',   COUNT(*)::TEXT FROM customers_raw WHERE email IS NULL\nUNION ALL\nSELECT 'invalid_emails',COUNT(*)::TEXT FROM customers_raw WHERE email NOT LIKE '%@%'\nUNION ALL\nSELECT 'duplicates',    (COUNT(*)-COUNT(DISTINCT customer_id))::TEXT FROM customers_raw\nUNION ALL\nSELECT 'neg_income',    COUNT(*)::TEXT FROM customers_raw WHERE income ~ '^-'\nUNION ALL\nSELECT 'null_phones',   COUNT(*)::TEXT FROM customers_raw WHERE phone IS NULL;"
+    },
+    {
+      "id": 199,
+      "cat": "Final Cleaning",
+      "q": "Build a full ETL cleaning script.",
+      "difficulty": "Expert",
+      "sol": "-- ETL: Extract → Transform → Load\n\n-- EXTRACT: raw source\nCREATE TEMP TABLE etl_raw AS SELECT * FROM customers_raw;\n\n-- TRANSFORM: clean all fields\nCREATE TEMP TABLE etl_clean AS\nSELECT DISTINCT ON (customer_id)\n  customer_id,\n  INITCAP(NULLIF(TRIM(first_name),''))  AS first_name,\n  INITCAP(NULLIF(TRIM(last_name),''))   AS last_name,\n  LOWER(NULLIF(TRIM(email),''))         AS email,\n  REGEXP_REPLACE(COALESCE(phone,''),'[^0-9]','','g') AS phone,\n  CASE WHEN income ILIKE '%K'\n    THEN ((REPLACE(UPPER(income),'K',''))::NUMERIC*1000)::TEXT\n    ELSE NULLIF(REGEXP_REPLACE(income,'[^0-9.]','','g'),'')\n  END AS income,\n  CASE WHEN LOWER(is_active) IN ('yes','true','y','1') THEN 'Yes' ELSE 'No' END AS is_active\nFROM etl_raw\nWHERE email LIKE '%@%'\nORDER BY customer_id, ctid;\n\n-- LOAD\nINSERT INTO customers_final SELECT * FROM etl_clean;"
+    },
+    {
+      "id": 200,
+      "cat": "Final Cleaning",
+      "q": "Export the clean dataset to CSV.",
+      "difficulty": "Advanced",
+      "sol": "COPY (\n  SELECT\n    customer_id,\n    INITCAP(TRIM(first_name))  AS first_name,\n    INITCAP(TRIM(last_name))   AS last_name,\n    LOWER(TRIM(email))         AS email,\n    REGEXP_REPLACE(COALESCE(phone,''),'[^0-9]','','g') AS phone,\n    customer_segment, is_active\n  FROM customers_raw\n  WHERE email LIKE '%@%'\n  ORDER BY customer_id\n) TO '/tmp/customers_clean.csv'\nWITH (FORMAT CSV, HEADER TRUE, DELIMITER ',', QUOTE '\"');"
+    }
+  ],
+  "join_questions": [
+    {
+      "id": 1,
+      "cat": "Basic Joins",
+      "q": "Write a query to display employee name and department name.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.dept_id;"
+    },
+    {
+      "id": 2,
+      "cat": "Basic Joins",
+      "q": "Write a query to show all employees with their department names.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.dept_id\nORDER BY e.emp_name;"
+    },
+    {
+      "id": 3,
+      "cat": "Basic Joins",
+      "q": "Write a query to list employees who do not belong to any department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name\nFROM employees e\nLEFT JOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id IS NULL;"
+    },
+    {
+      "id": 4,
+      "cat": "Basic Joins",
+      "q": "Write a query to find departments that have no employees.",
+      "difficulty": "Beginner",
+      "sol": "SELECT d.dept_name\nFROM departments d\nLEFT JOIN employees e ON d.dept_id = e.dept_id\nWHERE e.emp_id IS NULL;"
+    },
+    {
+      "id": 5,
+      "cat": "Basic Joins",
+      "q": "Write a query to display employee name, salary, and department name.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id;"
+    },
+    {
+      "id": 6,
+      "cat": "Basic Joins",
+      "q": "Write a query to find employees working in the 'IT' department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_name = 'IT';"
+    },
+    {
+      "id": 7,
+      "cat": "Basic Joins",
+      "q": "Write a query to list all departments and employees (including unmatched records).",
+      "difficulty": "Intermediate",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nFULL OUTER JOIN departments d ON e.dept_id = d.dept_id;"
+    },
+    {
+      "id": 8,
+      "cat": "Basic Joins",
+      "q": "Write a query to show employees along with department location.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name, d.location\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id;"
+    },
+    {
+      "id": 9,
+      "cat": "Basic Joins",
+      "q": "Write a query to find employees whose department is located in Delhi.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.location = 'Delhi';"
+    },
+    {
+      "id": 10,
+      "cat": "Basic Joins",
+      "q": "Write a query to display employee names sorted by department name.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nORDER BY d.dept_name, e.emp_name;"
+    },
+    {
+      "id": 11,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to count employees in each department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT d.dept_name, COUNT(e.emp_id) AS emp_count\nFROM departments d\nLEFT JOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nORDER BY emp_count DESC;"
+    },
+    {
+      "id": 12,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find the department with the maximum number of employees.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT d.dept_name, COUNT(e.emp_id) AS emp_count\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nORDER BY emp_count DESC\nLIMIT 1;"
+    },
+    {
+      "id": 13,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to calculate average salary in each department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT d.dept_name, ROUND(AVG(e.salary),2) AS avg_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name;"
+    },
+    {
+      "id": 14,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find total salary paid in each department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT d.dept_name, SUM(e.salary) AS total_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nORDER BY total_salary DESC;"
+    },
+    {
+      "id": 15,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find departments where average salary is greater than 50000.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT d.dept_name, ROUND(AVG(e.salary),2) AS avg_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nHAVING AVG(e.salary) > 50000;"
+    },
+    {
+      "id": 16,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find the highest salary in each department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT d.dept_name, MAX(e.salary) AS max_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name;"
+    },
+    {
+      "id": 17,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find the lowest salary in each department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT d.dept_name, MIN(e.salary) AS min_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name;"
+    },
+    {
+      "id": 18,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to count employees in each department location.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT d.location, COUNT(e.emp_id) AS emp_count\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.location\nORDER BY emp_count DESC;"
+    },
+    {
+      "id": 19,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find departments with more than 5 employees.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT d.dept_name, COUNT(e.emp_id) AS emp_count\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nHAVING COUNT(e.emp_id) > 5;"
+    },
+    {
+      "id": 20,
+      "cat": "Aggregation Joins",
+      "q": "Write a query to find the department with the lowest average salary.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT d.dept_name, ROUND(AVG(e.salary),2) AS avg_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nORDER BY avg_salary ASC\nLIMIT 1;"
+    },
+    {
+      "id": 21,
+      "cat": "Filtered Joins",
+      "q": "Write a query to find employees earning more than 60000 along with their department names.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.salary > 60000\nORDER BY e.salary DESC;"
+    },
+    {
+      "id": 22,
+      "cat": "Filtered Joins",
+      "q": "Write a query to find employees whose salary is greater than the average salary of their department.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.salary > (\n  SELECT AVG(e2.salary)\n  FROM employees e2\n  WHERE e2.dept_id = e.dept_id\n)\nORDER BY d.dept_name, e.salary DESC;"
+    },
+    {
+      "id": 23,
+      "cat": "Filtered Joins",
+      "q": "Write a query to find employees working in departments located in Mumbai.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.location = 'Mumbai';"
+    },
+    {
+      "id": 24,
+      "cat": "Filtered Joins",
+      "q": "Write a query to find employees whose department name starts with 'S'.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_name LIKE 'S%';"
+    },
+    {
+      "id": 25,
+      "cat": "Filtered Joins",
+      "q": "Write a query to find employees who work in either HR or IT department.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_name IN ('HR', 'IT')\nORDER BY d.dept_name, e.emp_name;"
+    },
+    {
+      "id": 26,
+      "cat": "Self Joins",
+      "q": "Write a query to display employees and their managers.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT e.emp_name AS employee,\n       COALESCE(m.emp_name, 'No Manager') AS manager\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.emp_id;"
+    },
+    {
+      "id": 27,
+      "cat": "Self Joins",
+      "q": "Write a query to find employees who do not have a manager.",
+      "difficulty": "Beginner",
+      "sol": "SELECT emp_name\nFROM employees\nWHERE manager_id IS NULL;"
+    },
+    {
+      "id": 28,
+      "cat": "Self Joins",
+      "q": "Write a query to find managers and the number of employees reporting to them.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT m.emp_name AS manager,\n       COUNT(e.emp_id) AS total_reports\nFROM employees e\nJOIN employees m ON e.manager_id = m.emp_id\nGROUP BY m.emp_name\nORDER BY total_reports DESC;"
+    },
+    {
+      "id": 29,
+      "cat": "Self Joins",
+      "q": "Write a query to find employees who report to the same manager.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT e1.emp_name AS employee1,\n       e2.emp_name AS employee2,\n       m.emp_name AS common_manager\nFROM employees e1\nJOIN employees e2\n  ON e1.manager_id = e2.manager_id\n  AND e1.emp_id < e2.emp_id\nJOIN employees m ON e1.manager_id = m.emp_id;"
+    },
+    {
+      "id": 30,
+      "cat": "Self Joins",
+      "q": "Write a query to display employee name and manager name along with department.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT e.emp_name,\n       COALESCE(m.emp_name,'No Manager') AS manager_name,\n       d.dept_name\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.emp_id\nJOIN departments d ON e.dept_id = d.dept_id;"
+    },
+    {
+      "id": 31,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find the second highest salary in each department.",
+      "difficulty": "Advanced",
+      "sol": "SELECT emp_name, salary, dept_name\nFROM (\n  SELECT e.emp_name, e.salary, d.dept_name,\n    DENSE_RANK() OVER (\n      PARTITION BY e.dept_id\n      ORDER BY e.salary DESC\n    ) AS dr\n  FROM employees e\n  JOIN departments d ON e.dept_id = d.dept_id\n) ranked\nWHERE dr = 2;"
+    },
+    {
+      "id": 32,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees who earn the highest salary in their department.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.salary = (\n  SELECT MAX(e2.salary)\n  FROM employees e2\n  WHERE e2.dept_id = e.dept_id\n);"
+    },
+    {
+      "id": 33,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees who work in departments with more than 10 employees.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id IN (\n  SELECT dept_id\n  FROM employees\n  GROUP BY dept_id\n  HAVING COUNT(*) > 10\n);"
+    },
+    {
+      "id": 34,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees whose salary is greater than their manager's salary.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, e.salary,\n       m.emp_name AS manager_name, m.salary AS mgr_salary\nFROM employees e\nJOIN employees m ON e.manager_id = m.emp_id\nWHERE e.salary > m.salary;"
+    },
+    {
+      "id": 35,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees who work in the same department as their manager.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN employees m ON e.manager_id = m.emp_id\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.dept_id = m.dept_id;"
+    },
+    {
+      "id": 36,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees and department where salary > 50000 and location = Delhi.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name, d.location\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.salary > 50000\n  AND d.location = 'Delhi'\nORDER BY e.salary DESC;"
+    },
+    {
+      "id": 37,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees hired in departments located in Bangalore.",
+      "difficulty": "Intermediate",
+      "sol": "SELECT e.emp_name, e.hire_date, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.location = 'Bangalore'\nORDER BY e.hire_date;"
+    },
+    {
+      "id": 38,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees and department ordered by salary descending.",
+      "difficulty": "Beginner",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nORDER BY e.salary DESC;"
+    },
+    {
+      "id": 39,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find employees working in departments with average salary above 70000.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id IN (\n  SELECT dept_id\n  FROM employees\n  GROUP BY dept_id\n  HAVING AVG(salary) > 70000\n);"
+    },
+    {
+      "id": 40,
+      "cat": "Advanced Joins",
+      "q": "Write a query to find departments where total salary expense exceeds 500000.",
+      "difficulty": "Advanced",
+      "sol": "SELECT d.dept_name, SUM(e.salary) AS total_salary\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nGROUP BY d.dept_name\nHAVING SUM(e.salary) > 500000\nORDER BY total_salary DESC;"
+    },
+    {
+      "id": 41,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees who are the only employee in their department.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id IN (\n  SELECT dept_id FROM employees GROUP BY dept_id HAVING COUNT(*) = 1\n);"
+    },
+    {
+      "id": 42,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees who share the same salary in the same department.",
+      "difficulty": "Advanced",
+      "sol": "SELECT e1.emp_name, e2.emp_name AS colleague,\n       e1.salary, d.dept_name\nFROM employees e1\nJOIN employees e2\n  ON e1.dept_id = e2.dept_id\n  AND e1.salary = e2.salary\n  AND e1.emp_id < e2.emp_id\nJOIN departments d ON e1.dept_id = d.dept_id;"
+    },
+    {
+      "id": 43,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees working in departments with the highest average salary.",
+      "difficulty": "Expert",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id = (\n  SELECT dept_id FROM employees\n  GROUP BY dept_id\n  ORDER BY AVG(salary) DESC\n  LIMIT 1\n);"
+    },
+    {
+      "id": 44,
+      "cat": "Complex Joins",
+      "q": "Write a query to find departments where every employee earns more than 50000.",
+      "difficulty": "Expert",
+      "sol": "SELECT d.dept_name\nFROM departments d\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM employees e\n  WHERE e.dept_id = d.dept_id\n    AND e.salary <= 50000\n);"
+    },
+    {
+      "id": 45,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees who work in the department with the highest number of employees.",
+      "difficulty": "Expert",
+      "sol": "SELECT e.emp_name, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id = (\n  SELECT dept_id FROM employees\n  GROUP BY dept_id\n  ORDER BY COUNT(*) DESC\n  LIMIT 1\n);"
+    },
+    {
+      "id": 46,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees who work in departments where no employee earns less than 30000.",
+      "difficulty": "Expert",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id IN (\n  SELECT dept_id FROM employees\n  GROUP BY dept_id\n  HAVING MIN(salary) >= 30000\n);"
+    },
+    {
+      "id": 47,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees who earn the second highest salary overall but show department name.",
+      "difficulty": "Expert",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.salary = (\n  SELECT DISTINCT salary\n  FROM employees\n  ORDER BY salary DESC\n  OFFSET 1 LIMIT 1\n);"
+    },
+    {
+      "id": 48,
+      "cat": "Complex Joins",
+      "q": "Write a query to find departments that have employees with salaries greater than 100000.",
+      "difficulty": "Advanced",
+      "sol": "SELECT DISTINCT d.dept_name\nFROM departments d\nJOIN employees e ON d.dept_id = e.dept_id\nWHERE e.salary > 100000\nORDER BY d.dept_name;"
+    },
+    {
+      "id": 49,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees whose salary is equal to the average salary of their department.",
+      "difficulty": "Expert",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE e.salary = (\n  SELECT ROUND(AVG(e2.salary))\n  FROM employees e2\n  WHERE e2.dept_id = e.dept_id\n);"
+    },
+    {
+      "id": 50,
+      "cat": "Complex Joins",
+      "q": "Write a query to find employees whose department has the highest total salary expense.",
+      "difficulty": "Expert",
+      "sol": "SELECT e.emp_name, e.salary, d.dept_name\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nWHERE d.dept_id = (\n  SELECT dept_id FROM employees\n  GROUP BY dept_id\n  ORDER BY SUM(salary) DESC\n  LIMIT 1\n);"
+    }
+  ],
+  "interview_questions": [
+    {
+      "id": 1,
+      "company": "Amazon",
+      "q": "Find customers with purchases in 3 consecutive months.",
+      "cat": "Window Functions",
+      "d": "Hard"
+    },
+    {
+      "id": 2,
+      "company": "Google",
+      "q": "Find the 2nd highest income customer in each segment.",
+      "cat": "DENSE_RANK",
+      "d": "Medium"
+    },
+    {
+      "id": 3,
+      "company": "Meta",
+      "q": "Find users who logged in on Jan 1 AND Jan 2.",
+      "cat": "Self Join",
+      "d": "Medium"
+    },
+    {
+      "id": 4,
+      "company": "Microsoft",
+      "q": "Find departments where avg salary > company average.",
+      "cat": "Subquery",
+      "d": "Medium"
+    },
+    {
+      "id": 5,
+      "company": "Netflix",
+      "q": "Find the longest streak of daily logins.",
+      "cat": "Window Functions",
+      "d": "Hard"
+    },
+    {
+      "id": 6,
+      "company": "Uber",
+      "q": "Find all pairs of customers in the same city.",
+      "cat": "Self Join",
+      "d": "Medium"
+    },
+    {
+      "id": 7,
+      "company": "Amazon",
+      "q": "Deduplicate a transaction table keeping the latest record.",
+      "cat": "CTE + ROW_NUMBER",
+      "d": "Hard"
+    },
+    {
+      "id": 8,
+      "company": "Google",
+      "q": "Find customers who placed an order every month this year.",
+      "cat": "Aggregation",
+      "d": "Hard"
+    },
+    {
+      "id": 9,
+      "company": "Meta",
+      "q": "Calculate the 7-day rolling average of daily signups.",
+      "cat": "Window Functions",
+      "d": "Hard"
+    },
+    {
+      "id": 10,
+      "company": "Stripe",
+      "q": "Find all transactions where amount > avg of the same user.",
+      "cat": "Correlated Subquery",
+      "d": "Medium"
+    }
+  ],
+  "settings": {
+    "admin_pass_hash": "$2a$10$SdnIR6KjJ0WA90ZpvZhwb.0AbpuaCyxLyMC2n2ESQVe0LaVm1rltu"
+  },
+  "_cleaningSeq": 200,
+  "_joinSeq": 50,
+  "_interviewSeq": 10
+}
