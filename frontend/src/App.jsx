@@ -1706,6 +1706,7 @@ function AdminLoginModal({ onSuccess, onClose, backendAvailable }) {
 }
 
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
+// Public nav items — Admin is HIDDEN from sidebar, accessible via secret tap
 const NAV_ITEMS = [
   { id:"dashboard",  label:"Dashboard",  icon:"🏠" },
   { id:"curriculum", label:"Learn",      icon:"📘" },
@@ -1714,7 +1715,15 @@ const NAV_ITEMS = [
   { id:"playground", label:"Playground", icon:"⚡" },
   { id:"interview",  label:"Interview",  icon:"🎯" },
   { id:"progress",   label:"Progress",   icon:"📊" },
-  { id:"admin",      label:"Admin",      icon:"⚙️" },
+];
+
+// Mobile bottom nav (most important pages only)
+const MOBILE_NAV = [
+  { id:"dashboard",  label:"Home",      icon:"🏠" },
+  { id:"curriculum", label:"Learn",     icon:"📘" },
+  { id:"cleaning",   label:"Clean",     icon:"🧹" },
+  { id:"joins",      label:"JOINs",     icon:"🔗" },
+  { id:"progress",   label:"Progress",  icon:"📊" },
 ];
 
 export default function App() {
@@ -1727,6 +1736,8 @@ export default function App() {
   const [showLogin,     setShowLogin]     = useState(false);
   const [backendOk,     setBackendOk]     = useState(false);
   const [dataLoaded,    setDataLoaded]    = useState(false);
+  const [sidebarOpen,   setSidebarOpen]   = useState(false);
+  const [logoTaps,      setLogoTaps]      = useState(0); // secret admin access
 
   // ── Persist progress to localStorage whenever it changes ──
   useEffect(() => { progressToLS(progress); }, [progress]);
@@ -1747,14 +1758,21 @@ export default function App() {
         if (j.length) setJoinQuestions(j);
         if (i.length) setInterviewQs(i);
       } catch {
-        // Backend unavailable — use localStorage data (already in state)
+        // Backend unavailable — use localStorage data
       }
       setDataLoaded(true);
     }
     loadFromBackend();
   }, []);
 
-  // ── Persist progress to localStorage on change ──
+  // ── Mobile responsive breakpoint ──
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+
   const handleSetProgress = useCallback((updater) => {
     setProgress(prev => {
       const next = typeof updater === "function" ? updater(prev) : updater;
@@ -1766,9 +1784,22 @@ export default function App() {
   const navigate = (id) => {
     if (id==="admin"&&!adminAuthed) { setShowLogin(true); }
     else { setView(id); }
+    setSidebarOpen(false);
   };
   const handleAdminSuccess = () => { setAdminAuthed(true); setShowLogin(false); setView("admin"); };
   const handleAdminLogout  = () => { setAdminAuthed(false); setView("dashboard"); };
+
+  // Secret admin access — tap logo 5 times quickly
+  const handleLogoTap = () => {
+    const next = logoTaps + 1;
+    setLogoTaps(next);
+    if (next >= 5) {
+      setLogoTaps(0);
+      if (!adminAuthed) setShowLogin(true);
+      else navigate("admin");
+    }
+    setTimeout(() => setLogoTaps(0), 3000);
+  };
 
   if (!dataLoaded) return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh",
@@ -1792,60 +1823,154 @@ export default function App() {
                                 onLogout={handleAdminLogout} backendAvailable={backendOk} />,
   };
 
+  // ── SIDEBAR CONTENT (shared between desktop and mobile drawer) ──
+  const SidebarContent = () => (
+    <>
+      <div onClick={handleLogoTap} style={{ padding:"28px 22px 22px", borderBottom:`1px solid ${T.border}`, cursor:"pointer", userSelect:"none" }}>
+        <div style={{ fontSize:22, fontWeight:900, letterSpacing:-.5, fontFamily:"Georgia,serif" }}>
+          <span style={{ color:T.accent }}>SQL</span><span style={{ color:T.text }}>Master</span>
+        </div>
+        <div style={{ fontSize:11, color:T.dim, marginTop:3, letterSpacing:1 }}>LEARN · PRACTICE · MASTER</div>
+        {logoTaps > 0 && logoTaps < 5 && (
+          <div style={{ fontSize:10, color:T.pink, marginTop:4 }}>🔐 {5-logoTaps} more taps for admin...</div>
+        )}
+      </div>
+      <nav style={{ padding:"14px 10px", flex:1, overflowY:"auto" }}>
+        {NAV_ITEMS.map(n=>{
+          const active=view===n.id, isJoins=n.id==="joins";
+          return (
+            <div key={n.id} onClick={()=>navigate(n.id)}
+              style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
+                borderRadius:10, cursor:"pointer", marginBottom:2,
+                background:active?T.accent+"18":"transparent",
+                color:active?T.accent:T.dim,
+                fontWeight:active?700:500, fontSize:14, transition:"all .15s" }}>
+              <span style={{ fontSize:17 }}>{n.icon}</span>
+              <span>{n.label}</span>
+              {isJoins&&(
+                <span style={{ marginLeft:"auto", background:T.teal+"25", color:T.teal,
+                  fontSize:9, padding:"2px 6px", borderRadius:99, fontWeight:800 }}>NEW</span>
+              )}
+            </div>
+          );
+        })}
+        {/* Admin shown ONLY when authenticated */}
+        {adminAuthed && (
+          <div onClick={()=>navigate("admin")}
+            style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
+              borderRadius:10, cursor:"pointer", marginBottom:2, marginTop:8,
+              background:view==="admin"?T.pink+"18":"transparent",
+              color:view==="admin"?T.pink:T.dim,
+              fontWeight:view==="admin"?700:500, fontSize:14,
+              borderTop:`1px solid ${T.border}` }}>
+            <span style={{ fontSize:17 }}>⚙️</span>
+            <span>Admin</span>
+            <span style={{ marginLeft:"auto", background:T.green+"25", color:T.green,
+              fontSize:9, padding:"2px 6px", borderRadius:99, fontWeight:800 }}>ON</span>
+          </div>
+        )}
+      </nav>
+      <div style={{ padding:"16px 18px", borderTop:`1px solid ${T.border}`, margin:"0 8px 12px" }}>
+        <div style={{ background:"linear-gradient(135deg,#1e1040,#0c1a35)",
+          border:`1px solid ${T.accent}25`, borderRadius:12, padding:"14px 16px", textAlign:"center" }}>
+          <div style={{ fontSize:22, fontWeight:900, color:T.accent }}>{progress.xp} XP</div>
+          <div style={{ fontSize:11, color:T.dim, marginTop:2 }}>Level {Math.floor(progress.xp/500)+1}</div>
+          <div style={{ marginTop:8, height:5, borderRadius:99, background:T.muted }}>
+            <div style={{ height:"100%", borderRadius:99,
+              background:`linear-gradient(90deg,${T.purple},${T.accent})`,
+              width:`${(progress.xp%500)/5}%`, transition:"width .4s" }} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", minHeight:"100vh", background:T.bg,
+        color:T.text, fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
+        {showLogin&&<AdminLoginModal onSuccess={handleAdminSuccess} onClose={()=>setShowLogin(false)} backendAvailable={backendOk} />}
+
+        {/* Mobile top header */}
+        <div style={{ position:"sticky", top:0, zIndex:100, background:T.sidebar,
+          borderBottom:`1px solid ${T.border}`, padding:"12px 16px",
+          display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div onClick={handleLogoTap} style={{ cursor:"pointer", userSelect:"none" }}>
+            <span style={{ fontSize:18, fontWeight:900, fontFamily:"Georgia,serif" }}>
+              <span style={{ color:T.accent }}>SQL</span><span style={{ color:T.text }}>Master</span>
+            </span>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ fontSize:13, fontWeight:700, color:T.accent }}>{progress.xp} XP</div>
+            {/* Hamburger */}
+            <button onClick={()=>setSidebarOpen(true)}
+              style={{ background:"none", border:"none", color:T.text, fontSize:22, cursor:"pointer", padding:"2px 4px" }}>
+              ☰
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile drawer overlay */}
+        {sidebarOpen && (
+          <div style={{ position:"fixed", inset:0, zIndex:500, display:"flex" }}>
+            <div style={{ flex:1, background:"rgba(0,0,0,0.6)" }} onClick={()=>setSidebarOpen(false)} />
+            <div style={{ width:260, background:T.sidebar, borderLeft:`1px solid ${T.border}`,
+              display:"flex", flexDirection:"column", overflowY:"auto" }}>
+              <div style={{ display:"flex", justifyContent:"flex-end", padding:"12px 16px" }}>
+                <button onClick={()=>setSidebarOpen(false)}
+                  style={{ background:"none", border:"none", color:T.dim, fontSize:22, cursor:"pointer" }}>✕</button>
+              </div>
+              <SidebarContent />
+            </div>
+          </div>
+        )}
+
+        {/* Mobile main content */}
+        <div style={{ flex:1, overflowY:"auto", paddingBottom:70 }}>
+          <div style={{ padding:"16px" }}>
+            {VIEWS[view]}
+          </div>
+        </div>
+
+        {/* Mobile bottom navigation */}
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:100,
+          background:T.sidebar, borderTop:`1px solid ${T.border}`,
+          display:"flex", alignItems:"center" }}>
+          {MOBILE_NAV.map(n=>{
+            const active = view===n.id;
+            return (
+              <button key={n.id} onClick={()=>navigate(n.id)}
+                style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center",
+                  gap:3, padding:"10px 4px", background:"none", border:"none", cursor:"pointer",
+                  color:active?T.accent:T.dim, transition:"all .15s" }}>
+                <span style={{ fontSize:20 }}>{n.icon}</span>
+                <span style={{ fontSize:10, fontWeight:active?700:400 }}>{n.label}</span>
+                {active && <div style={{ width:20, height:2, borderRadius:99, background:T.accent }} />}
+              </button>
+            );
+          })}
+          {/* More button for extra pages */}
+          <button onClick={()=>setSidebarOpen(true)}
+            style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center",
+              gap:3, padding:"10px 4px", background:"none", border:"none", cursor:"pointer", color:T.dim }}>
+            <span style={{ fontSize:20 }}>⋯</span>
+            <span style={{ fontSize:10 }}>More</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── DESKTOP LAYOUT ──
   return (
     <div style={{ display:"flex", minHeight:"100vh", background:T.bg,
       color:T.text, fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
       {showLogin&&<AdminLoginModal onSuccess={handleAdminSuccess} onClose={()=>setShowLogin(false)} backendAvailable={backendOk} />}
 
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <div style={{ width:220, background:T.sidebar, borderRight:`1px solid ${T.border}`,
         display:"flex", flexDirection:"column", flexShrink:0, position:"sticky", top:0, height:"100vh", overflowY:"auto" }}>
-        <div style={{ padding:"28px 22px 22px", borderBottom:`1px solid ${T.border}` }}>
-          <div style={{ fontSize:22, fontWeight:900, letterSpacing:-.5, fontFamily:"Georgia,serif" }}>
-            <span style={{ color:T.accent }}>SQL</span><span style={{ color:T.text }}>Master</span>
-          </div>
-          <div style={{ fontSize:11, color:T.dim, marginTop:3, letterSpacing:1 }}>LEARN · PRACTICE · MASTER</div>
-        </div>
-        <nav style={{ padding:"14px 10px", flex:1 }}>
-          {NAV_ITEMS.map(n=>{
-            const active=view===n.id, isAdmin=n.id==="admin", isJoins=n.id==="joins";
-            return (
-              <div key={n.id} onClick={()=>navigate(n.id)}
-                style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
-                  borderRadius:10, cursor:"pointer", marginBottom:2,
-                  background:active?T.accent+"18":"transparent",
-                  color:active?T.accent:isAdmin&&!adminAuthed?T.pink:T.dim,
-                  fontWeight:active?700:500, fontSize:14, transition:"all .15s" }}>
-                <span style={{ fontSize:17 }}>{n.icon}</span>
-                <span>{n.label}</span>
-                {isJoins&&(
-                  <span style={{ marginLeft:"auto", background:T.teal+"25", color:T.teal,
-                    fontSize:9, padding:"2px 6px", borderRadius:99, fontWeight:800 }}>NEW</span>
-                )}
-                {isAdmin&&(
-                  <span style={{ marginLeft:"auto",
-                    background:adminAuthed?T.green+"25":T.pink+"25",
-                    color:adminAuthed?T.green:T.pink,
-                    fontSize:9, padding:"2px 6px", borderRadius:99, fontWeight:800 }}>
-                    {adminAuthed?"ON":"🔒"}
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </nav>
-        <div style={{ padding:"16px 18px", borderTop:`1px solid ${T.border}`, margin:"0 8px 12px" }}>
-          <div style={{ background:"linear-gradient(135deg,#1e1040,#0c1a35)",
-            border:`1px solid ${T.accent}25`, borderRadius:12, padding:"14px 16px", textAlign:"center" }}>
-            <div style={{ fontSize:22, fontWeight:900, color:T.accent }}>{progress.xp} XP</div>
-            <div style={{ fontSize:11, color:T.dim, marginTop:2 }}>Level {Math.floor(progress.xp/500)+1}</div>
-            <div style={{ marginTop:8, height:5, borderRadius:99, background:T.muted }}>
-              <div style={{ height:"100%", borderRadius:99,
-                background:`linear-gradient(90deg,${T.purple},${T.accent})`,
-                width:`${(progress.xp%500)/5}%`, transition:"width .4s" }} />
-            </div>
-          </div>
-        </div>
+        <SidebarContent />
       </div>
 
       {/* Main content */}
