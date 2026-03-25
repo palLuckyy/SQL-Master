@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { API, saveToken, clearToken } from "./api.js";
+import { API, saveToken, clearToken, saveUserToken, clearUserToken, getSavedUser, saveUser } from "./api.js";
 import CurriculumView from "./Learn.jsx";
+import AuthGate, { DailyChallenge } from "./Auth.jsx";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const T = {
@@ -963,7 +964,7 @@ function ProgressView({ progress, questions, joinQuestions }) {
 }
 
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
-function Dashboard({ progress, setView, questions, joinQuestions }) {
+function Dashboard({ progress, setView, questions, joinQuestions, currentUser, onLoginClick }) {
   const totalQ = questions.length + joinQuestions.length;
   const totalSolved = progress.solvedQ.size + (progress.solvedJ||new Set()).size;
   const level = Math.floor(progress.xp/500)+1;
@@ -1053,7 +1054,7 @@ function Dashboard({ progress, setView, questions, joinQuestions }) {
 
 // ─── ADMIN PANEL ──────────────────────────────────────────────────────────────
 function AdminPanel({ questions, setQuestions, joinQuestions, setJoinQuestions, interviewQs, setInterviewQs, onLogout, backendAvailable }) {
-  const [tab,     setTab]     = useState("cleaning");
+  const [tab,     setTab]     = useState("users");
   const [editing, setEditing] = useState(null);
   const [cForm,   setCForm]   = useState({ q:"", cat:"Exploration", difficulty:"Beginner", sol:"" });
   const [jForm,   setJForm]   = useState({ q:"", cat:"Basic Joins", difficulty:"Beginner", sol:"" });
@@ -1220,6 +1221,7 @@ function AdminPanel({ questions, setQuestions, joinQuestions, setJoinQuestions, 
   );
 
   const TABS = [
+    { id:"users",     label:"👥 Users" },
     { id:"cleaning",  label:`🧹 Cleaning`, count:questions.length },
     { id:"joins",     label:`🔗 JOINs`,    count:joinQuestions.length },
     { id:"interview", label:`🎯 Interview`, count:interviewQs.length },
@@ -1264,6 +1266,9 @@ function AdminPanel({ questions, setQuestions, joinQuestions, setJoinQuestions, 
           </button>
         ))}
       </div>
+
+      {/* Users Tab */}
+      {tab==="users" && <AdminUsersView />}
 
       {/* Cleaning Questions */}
       {tab==="cleaning" && (
@@ -1717,14 +1722,149 @@ const NAV_ITEMS = [
   { id:"progress",   label:"Progress",   icon:"📊" },
 ];
 
-// Mobile bottom nav (most important pages only)
+// Mobile bottom nav
 const MOBILE_NAV = [
-  { id:"dashboard",  label:"Home",      icon:"🏠" },
-  { id:"curriculum", label:"Learn",     icon:"📘" },
-  { id:"cleaning",   label:"Clean",     icon:"🧹" },
-  { id:"joins",      label:"JOINs",     icon:"🔗" },
-  { id:"progress",   label:"Progress",  icon:"📊" },
+  { id:"dashboard",  label:"Home",     icon:"🏠" },
+  { id:"curriculum", label:"Learn",    icon:"📘" },
+  { id:"cleaning",   label:"Clean",    icon:"🧹" },
+  { id:"joins",      label:"JOINs",    icon:"🔗" },
+  { id:"progress",   label:"Progress", icon:"📊" },
 ];
+
+// ─── LEADERBOARD VIEW ─────────────────────────────────────────────────────────
+function LeaderboardView() {
+  const [board,   setBoard]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    API.leaderboard().then(d => { setBoard(d); setLoading(false); }).catch(()=>setLoading(false));
+  }, []);
+  const medals = ["🥇","🥈","🥉"];
+  return (
+    <div>
+      <div style={{ marginBottom:28 }}>
+        <h2 style={{ margin:"0 0 6px", color:T.text, fontSize:22, fontWeight:800 }}>🏆 Leaderboard</h2>
+        <p style={{ margin:0, color:T.dim, fontSize:14 }}>Top SQL learners ranked by XP</p>
+      </div>
+      {loading && <div style={{ textAlign:"center", padding:"60px 0", color:T.dim }}>Loading...</div>}
+      {!loading && board.length === 0 && (
+        <div style={{ textAlign:"center", padding:"60px 0", color:T.dim }}>
+          <div style={{ fontSize:48, marginBottom:12 }}>🏆</div>
+          <div>No users yet. Be the first to earn XP!</div>
+        </div>
+      )}
+      {!loading && board.map((u, i) => (
+        <div key={i} style={{ display:"flex", alignItems:"center", gap:16,
+          padding:"16px 20px", background:i<3?T.orange+"08":T.card,
+          border:`1px solid ${i<3?T.orange+"40":T.border}`,
+          borderRadius:12, marginBottom:10 }}>
+          <div style={{ width:42, height:42, borderRadius:"50%", flexShrink:0,
+            background:i<3?T.orange+"20":T.muted,
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:i<3?22:16, fontWeight:900, color:i<3?T.orange:T.dim }}>
+            {i<3 ? medals[i] : i+1}
+          </div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ color:T.text, fontWeight:700, fontSize:15 }}>{u.name}</div>
+            <div style={{ color:T.dim, fontSize:12, marginTop:3 }}>
+              {u.solved} solved · {u.streak} day streak · Active: {u.last_active||"—"}
+            </div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ color:T.accent, fontWeight:900, fontSize:20 }}>{u.xp}</div>
+            <div style={{ color:T.dim, fontSize:11 }}>XP</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── ADMIN USERS VIEW ─────────────────────────────────────────────────────────
+function AdminUsersView() {
+  const [users,   setUsers]   = useState([]);
+  const [stats,   setStats]   = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [search,  setSearch]  = useState("");
+
+  useEffect(() => {
+    Promise.all([API.adminUsers(), API.adminStats()])
+      .then(([u, s]) => { setUsers(u.users||[]); setStats(s); setLoading(false); })
+      .catch(()=>setLoading(false));
+  }, []);
+
+  const filtered = users.filter(u =>
+    !search || u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading) return <div style={{ textAlign:"center", padding:"60px 0", color:T.dim }}>Loading users...</div>;
+
+  return (
+    <div>
+      <h3 style={{ color:T.text, margin:"0 0 20px", fontWeight:800 }}>👥 Registered Users</h3>
+
+      {/* Stats */}
+      {stats && (
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
+          {[
+            { label:"Total Users",    val:stats.total_users,  color:T.accent,  icon:"👥" },
+            { label:"Active Today",   val:stats.active_today, color:T.green,   icon:"⚡" },
+            { label:"Total XP Given", val:stats.total_xp,     color:T.orange,  icon:"⭐" },
+            { label:"Total Solved",   val:stats.total_solved, color:T.purple,  icon:"✅" },
+          ].map(s=>(
+            <div key={s.label} style={{ background:T.card, border:`1px solid ${T.border}`,
+              borderRadius:12, padding:"16px 18px" }}>
+              <div style={{ fontSize:22, marginBottom:8 }}>{s.icon}</div>
+              <div style={{ fontSize:26, fontWeight:900, color:s.color }}>{s.val}</div>
+              <div style={{ color:T.dim, fontSize:12, marginTop:4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Search */}
+      <input value={search} onChange={e=>setSearch(e.target.value)}
+        placeholder="🔍 Search by name or email..."
+        style={{ width:"100%", background:T.card, border:`1px solid ${T.border2}`,
+          borderRadius:8, padding:"10px 16px", color:T.text, fontSize:14,
+          outline:"none", marginBottom:16, boxSizing:"border-box" }} />
+
+      {/* Table */}
+      <div style={{ overflowX:"auto" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+          <thead>
+            <tr style={{ borderBottom:`1px solid ${T.border}` }}>
+              {["Name","Email","XP","Solved","Streak","Lessons","Daily Done","Last Active","Joined"].map(h=>(
+                <th key={h} style={{ padding:"10px 14px", textAlign:"left", color:T.accent,
+                  fontWeight:700, fontSize:11, letterSpacing:1, whiteSpace:"nowrap" }}>{h.toUpperCase()}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(u=>(
+              <tr key={u.id} style={{ borderBottom:`1px solid ${T.border}30` }}
+                onMouseEnter={e=>e.currentTarget.style.background=T.card}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                <td style={{ padding:"12px 14px", color:T.text, fontWeight:600 }}>{u.name}</td>
+                <td style={{ padding:"12px 14px", color:T.dim2, fontSize:12 }}>{u.email}</td>
+                <td style={{ padding:"12px 14px", color:T.accent, fontWeight:700 }}>{u.xp}</td>
+                <td style={{ padding:"12px 14px", color:T.green }}>{u.solved_cleaning + u.solved_joins}</td>
+                <td style={{ padding:"12px 14px", color:T.orange }}>{u.streak}🔥</td>
+                <td style={{ padding:"12px 14px", color:T.purple }}>{u.lessons_done}</td>
+                <td style={{ padding:"12px 14px", color:T.teal }}>{u.daily_done}</td>
+                <td style={{ padding:"12px 14px", color:T.dim, fontSize:12 }}>{u.last_active||"—"}</td>
+                <td style={{ padding:"12px 14px", color:T.dim, fontSize:11 }}>
+                  {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {filtered.length===0 && <div style={{ textAlign:"center", padding:"40px 0", color:T.dim }}>No users found.</div>}
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [view,          setView]          = useState("dashboard");
@@ -1737,17 +1877,40 @@ export default function App() {
   const [backendOk,     setBackendOk]     = useState(false);
   const [dataLoaded,    setDataLoaded]    = useState(false);
   const [sidebarOpen,   setSidebarOpen]   = useState(false);
-  const [logoTaps,      setLogoTaps]      = useState(0); // secret admin access
+  const [logoTaps,      setLogoTaps]      = useState(0);
 
-  // ── Persist progress to localStorage whenever it changes ──
+  // ── USER AUTH STATE ──
+  const [currentUser,   setCurrentUser]   = useState(getSavedUser);
+  const [showAuth,      setShowAuth]      = useState(false);
+  const [dailyQuestion, setDailyQuestion] = useState(null);
+  const [showDaily,     setShowDaily]     = useState(false);
+
+  // ── Persist progress ──
   useEffect(() => { progressToLS(progress); }, [progress]);
+  useEffect(() => { lsSet("sm_cleaning",  questions); },    [questions]);
+  useEffect(() => { lsSet("sm_joins",     joinQuestions); }, [joinQuestions]);
+  useEffect(() => { lsSet("sm_interview", interviewQs); },   [interviewQs]);
 
-  // ── Persist questions to localStorage ──
-  useEffect(() => { lsSet("sm_cleaning",  questions); },     [questions]);
-  useEffect(() => { lsSet("sm_joins",     joinQuestions); },  [joinQuestions]);
-  useEffect(() => { lsSet("sm_interview", interviewQs); },    [interviewQs]);
+  // ── Sync user progress from backend when logged in ──
+  useEffect(() => {
+    if (currentUser && backendOk) {
+      API.getMe().then(data => {
+        const p = data.progress;
+        if (p) {
+          setProgress(prev => ({
+            ...prev,
+            xp:          p.xp          ?? prev.xp,
+            streak:      p.streak      ?? prev.streak,
+            solvedQ:     new Set(p.solved_q    || [...prev.solvedQ]),
+            solvedJ:     new Set(p.solved_j    || [...prev.solvedJ]),
+            doneLessons: new Set(p.done_lessons|| [...prev.doneLessons]),
+          }));
+        }
+      }).catch(() => {});
+    }
+  }, [currentUser, backendOk]);
 
-  // ── Try to load data from backend on mount ──
+  // ── Load backend data ──
   useEffect(() => {
     async function loadFromBackend() {
       try {
@@ -1757,47 +1920,79 @@ export default function App() {
         if (c.length) setQuestions(c);
         if (j.length) setJoinQuestions(j);
         if (i.length) setInterviewQs(i);
-      } catch {
-        // Backend unavailable — use localStorage data
-      }
+      } catch {}
       setDataLoaded(true);
     }
     loadFromBackend();
   }, []);
 
-  // ── Mobile responsive breakpoint ──
+  // ── Mobile ──
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
+    const h = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
   }, []);
 
+  // ── Save progress to backend whenever it changes ──
   const handleSetProgress = useCallback((updater) => {
     setProgress(prev => {
       const next = typeof updater === "function" ? updater(prev) : updater;
       progressToLS(next);
+      if (currentUser && backendOk) {
+        API.saveProgress({
+          xp:           next.xp,
+          streak:       next.streak,
+          solved_q:     [...next.solvedQ],
+          solved_j:     [...next.solvedJ],
+          done_lessons: [...next.doneLessons],
+        }).catch(() => {});
+      }
       return next;
     });
-  }, []);
+  }, [currentUser, backendOk]);
 
   const navigate = (id) => {
     if (id==="admin"&&!adminAuthed) { setShowLogin(true); }
     else { setView(id); }
     setSidebarOpen(false);
   };
+
   const handleAdminSuccess = () => { setAdminAuthed(true); setShowLogin(false); setView("admin"); };
   const handleAdminLogout  = () => { setAdminAuthed(false); setView("dashboard"); };
 
-  // Secret admin access — tap logo 5 times quickly
+  // ── User login handler ──
+  const handleUserAuth = (data) => {
+    setCurrentUser(data.user);
+    setShowAuth(false);
+    if (data.dailyQuestion) {
+      setDailyQuestion(data.dailyQuestion);
+      setShowDaily(true);
+    }
+    // Merge server progress
+    if (data.progress) {
+      const p = data.progress;
+      setProgress(prev => ({
+        ...prev,
+        xp:          p.xp          ?? prev.xp,
+        streak:      p.streak      ?? prev.streak,
+        solvedQ:     new Set(p.solved_q     || [...prev.solvedQ]),
+        solvedJ:     new Set(p.solved_j     || [...prev.solvedJ]),
+        doneLessons: new Set(p.done_lessons || [...prev.doneLessons]),
+      }));
+    }
+  };
+
+  const handleUserLogout = () => {
+    clearUserToken();
+    setCurrentUser(null);
+    setView("dashboard");
+  };
+
   const handleLogoTap = () => {
     const next = logoTaps + 1;
     setLogoTaps(next);
-    if (next >= 5) {
-      setLogoTaps(0);
-      if (!adminAuthed) setShowLogin(true);
-      else navigate("admin");
-    }
+    if (next >= 5) { setLogoTaps(0); if (!adminAuthed) setShowLogin(true); else navigate("admin"); }
     setTimeout(() => setLogoTaps(0), 3000);
   };
 
@@ -1809,21 +2004,35 @@ export default function App() {
     </div>
   );
 
+  // Show auth gate if not logged in and user clicked a protected action
+  if (showAuth) return <AuthGate onAuthenticated={handleUserAuth} />;
+
   const VIEWS = {
-    dashboard:  <Dashboard      progress={progress} setView={navigate} questions={questions} joinQuestions={joinQuestions} />,
-    curriculum: <CurriculumView progress={progress} setProgress={handleSetProgress} />,
-    cleaning:   <CleaningView   progress={progress} setProgress={handleSetProgress} questions={questions} />,
-    joins:      <JoinsView      progress={progress} setProgress={handleSetProgress} joinQuestions={joinQuestions} />,
-    playground: <PlaygroundView progress={progress} setProgress={handleSetProgress} />,
-    interview:  <InterviewView  interviewQs={interviewQs} />,
-    progress:   <ProgressView   progress={progress} questions={questions} joinQuestions={joinQuestions} />,
-    admin:      <AdminPanel     questions={questions} setQuestions={setQuestions}
-                                joinQuestions={joinQuestions} setJoinQuestions={setJoinQuestions}
-                                interviewQs={interviewQs} setInterviewQs={setInterviewQs}
-                                onLogout={handleAdminLogout} backendAvailable={backendOk} />,
+    dashboard:   <Dashboard      progress={progress} setView={navigate} questions={questions} joinQuestions={joinQuestions} currentUser={currentUser} onLoginClick={()=>setShowAuth(true)} />,
+    curriculum:  <CurriculumView progress={progress} setProgress={handleSetProgress} />,
+    cleaning:    <CleaningView   progress={progress} setProgress={handleSetProgress} questions={questions} />,
+    joins:       <JoinsView      progress={progress} setProgress={handleSetProgress} joinQuestions={joinQuestions} />,
+    playground:  <PlaygroundView progress={progress} setProgress={handleSetProgress} />,
+    interview:   <InterviewView  interviewQs={interviewQs} />,
+    progress:    <ProgressView   progress={progress} questions={questions} joinQuestions={joinQuestions} />,
+    leaderboard: <LeaderboardView />,
+    admin:       <AdminPanel     questions={questions} setQuestions={setQuestions}
+                                 joinQuestions={joinQuestions} setJoinQuestions={setJoinQuestions}
+                                 interviewQs={interviewQs} setInterviewQs={setInterviewQs}
+                                 onLogout={handleAdminLogout} backendAvailable={backendOk} />,
   };
 
-  // ── SIDEBAR CONTENT (shared between desktop and mobile drawer) ──
+  const NAV_PUBLIC = [
+    { id:"dashboard",   label:"Dashboard",   icon:"🏠" },
+    { id:"curriculum",  label:"Learn",        icon:"📘" },
+    { id:"cleaning",    label:"Cleaning",     icon:"🧹" },
+    { id:"joins",       label:"SQL JOINs",    icon:"🔗", badge:"NEW" },
+    { id:"playground",  label:"Playground",   icon:"⚡" },
+    { id:"interview",   label:"Interview",    icon:"🎯" },
+    { id:"leaderboard", label:"Leaderboard",  icon:"🏆" },
+    { id:"progress",    label:"Progress",     icon:"📊" },
+  ];
+
   const SidebarContent = () => (
     <>
       <div onClick={handleLogoTap} style={{ padding:"28px 22px 22px", borderBottom:`1px solid ${T.border}`, cursor:"pointer", userSelect:"none" }}>
@@ -1835,9 +2044,38 @@ export default function App() {
           <div style={{ fontSize:10, color:T.pink, marginTop:4 }}>🔐 {5-logoTaps} more taps for admin...</div>
         )}
       </div>
+
+      {/* User profile block */}
+      <div style={{ padding:"14px 16px", borderBottom:`1px solid ${T.border}` }}>
+        {currentUser ? (
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:36, height:36, borderRadius:"50%", background:T.accent+"25",
+              display:"flex", alignItems:"center", justifyContent:"center",
+              color:T.accent, fontWeight:800, fontSize:15, flexShrink:0 }}>
+              {currentUser.name.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ color:T.text, fontWeight:700, fontSize:13,
+                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{currentUser.name}</div>
+              <div style={{ color:T.dim, fontSize:11 }}>{progress.xp} XP · Lv{Math.floor(progress.xp/500)+1}</div>
+            </div>
+            <button onClick={handleUserLogout}
+              style={{ background:"none", border:"none", color:T.dim, cursor:"pointer", fontSize:16, flexShrink:0 }}
+              title="Logout">⏏</button>
+          </div>
+        ) : (
+          <button onClick={()=>setShowAuth(true)}
+            style={{ width:"100%", padding:"9px 14px", background:T.accent+"18",
+              border:`1px solid ${T.accent}40`, borderRadius:8, color:T.accent,
+              fontWeight:700, fontSize:13, cursor:"pointer" }}>
+            🔐 Sign In / Sign Up
+          </button>
+        )}
+      </div>
+
       <nav style={{ padding:"14px 10px", flex:1, overflowY:"auto" }}>
-        {NAV_ITEMS.map(n=>{
-          const active=view===n.id, isJoins=n.id==="joins";
+        {NAV_PUBLIC.map(n=>{
+          const active = view===n.id;
           return (
             <div key={n.id} onClick={()=>navigate(n.id)}
               style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
@@ -1847,22 +2085,21 @@ export default function App() {
                 fontWeight:active?700:500, fontSize:14, transition:"all .15s" }}>
               <span style={{ fontSize:17 }}>{n.icon}</span>
               <span>{n.label}</span>
-              {isJoins&&(
+              {n.badge && (
                 <span style={{ marginLeft:"auto", background:T.teal+"25", color:T.teal,
-                  fontSize:9, padding:"2px 6px", borderRadius:99, fontWeight:800 }}>NEW</span>
+                  fontSize:9, padding:"2px 6px", borderRadius:99, fontWeight:800 }}>{n.badge}</span>
               )}
             </div>
           );
         })}
-        {/* Admin shown ONLY when authenticated */}
         {adminAuthed && (
           <div onClick={()=>navigate("admin")}
             style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
-              borderRadius:10, cursor:"pointer", marginBottom:2, marginTop:8,
+              borderRadius:10, cursor:"pointer", marginTop:8,
               background:view==="admin"?T.pink+"18":"transparent",
               color:view==="admin"?T.pink:T.dim,
-              fontWeight:view==="admin"?700:500, fontSize:14,
-              borderTop:`1px solid ${T.border}` }}>
+              borderTop:`1px solid ${T.border}`,
+              fontWeight:view==="admin"?700:500, fontSize:14 }}>
             <span style={{ fontSize:17 }}>⚙️</span>
             <span>Admin</span>
             <span style={{ marginLeft:"auto", background:T.green+"25", color:T.green,
@@ -1870,6 +2107,7 @@ export default function App() {
           </div>
         )}
       </nav>
+
       <div style={{ padding:"16px 18px", borderTop:`1px solid ${T.border}`, margin:"0 8px 12px" }}>
         <div style={{ background:"linear-gradient(135deg,#1e1040,#0c1a35)",
           border:`1px solid ${T.accent}25`, borderRadius:12, padding:"14px 16px", textAlign:"center" }}>
@@ -1890,8 +2128,14 @@ export default function App() {
       <div style={{ display:"flex", flexDirection:"column", minHeight:"100vh", background:T.bg,
         color:T.text, fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
         {showLogin&&<AdminLoginModal onSuccess={handleAdminSuccess} onClose={()=>setShowLogin(false)} backendAvailable={backendOk} />}
+        {showDaily&&dailyQuestion&&(
+          <DailyChallenge
+            question={dailyQuestion} userName={currentUser?.name||""}
+            onClose={()=>setShowDaily(false)}
+            onSolve={(qid,score)=>{ API.dailyDone(qid,score).catch(()=>{}); if(score>=70)handleSetProgress(p=>({...p,xp:p.xp+50})); }}
+          />
+        )}
 
-        {/* Mobile top header */}
         <div style={{ position:"sticky", top:0, zIndex:100, background:T.sidebar,
           borderBottom:`1px solid ${T.border}`, padding:"12px 16px",
           display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -1900,21 +2144,32 @@ export default function App() {
               <span style={{ color:T.accent }}>SQL</span><span style={{ color:T.text }}>Master</span>
             </span>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ fontSize:13, fontWeight:700, color:T.accent }}>{progress.xp} XP</div>
-            {/* Hamburger */}
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            {currentUser ? (
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <div style={{ width:28, height:28, borderRadius:"50%", background:T.accent+"25",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  color:T.accent, fontWeight:800, fontSize:13 }}>
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </div>
+                <span style={{ fontSize:12, fontWeight:700, color:T.accent }}>{progress.xp} XP</span>
+              </div>
+            ) : (
+              <button onClick={()=>setShowAuth(true)}
+                style={{ padding:"5px 12px", background:T.accent+"18", border:`1px solid ${T.accent}40`,
+                  borderRadius:20, color:T.accent, fontWeight:700, fontSize:12, cursor:"pointer" }}>
+                Sign In
+              </button>
+            )}
             <button onClick={()=>setSidebarOpen(true)}
-              style={{ background:"none", border:"none", color:T.text, fontSize:22, cursor:"pointer", padding:"2px 4px" }}>
-              ☰
-            </button>
+              style={{ background:"none", border:"none", color:T.text, fontSize:22, cursor:"pointer" }}>☰</button>
           </div>
         </div>
 
-        {/* Mobile drawer overlay */}
         {sidebarOpen && (
           <div style={{ position:"fixed", inset:0, zIndex:500, display:"flex" }}>
             <div style={{ flex:1, background:"rgba(0,0,0,0.6)" }} onClick={()=>setSidebarOpen(false)} />
-            <div style={{ width:260, background:T.sidebar, borderLeft:`1px solid ${T.border}`,
+            <div style={{ width:270, background:T.sidebar, borderLeft:`1px solid ${T.border}`,
               display:"flex", flexDirection:"column", overflowY:"auto" }}>
               <div style={{ display:"flex", justifyContent:"flex-end", padding:"12px 16px" }}>
                 <button onClick={()=>setSidebarOpen(false)}
@@ -1925,31 +2180,25 @@ export default function App() {
           </div>
         )}
 
-        {/* Mobile main content */}
         <div style={{ flex:1, overflowY:"auto", paddingBottom:70 }}>
-          <div style={{ padding:"16px" }}>
-            {VIEWS[view]}
-          </div>
+          <div style={{ padding:"16px" }}>{VIEWS[view]}</div>
         </div>
 
-        {/* Mobile bottom navigation */}
         <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:100,
-          background:T.sidebar, borderTop:`1px solid ${T.border}`,
-          display:"flex", alignItems:"center" }}>
+          background:T.sidebar, borderTop:`1px solid ${T.border}`, display:"flex" }}>
           {MOBILE_NAV.map(n=>{
             const active = view===n.id;
             return (
               <button key={n.id} onClick={()=>navigate(n.id)}
                 style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center",
-                  gap:3, padding:"10px 4px", background:"none", border:"none", cursor:"pointer",
-                  color:active?T.accent:T.dim, transition:"all .15s" }}>
+                  gap:3, padding:"10px 4px", background:"none", border:"none",
+                  cursor:"pointer", color:active?T.accent:T.dim }}>
                 <span style={{ fontSize:20 }}>{n.icon}</span>
                 <span style={{ fontSize:10, fontWeight:active?700:400 }}>{n.label}</span>
                 {active && <div style={{ width:20, height:2, borderRadius:99, background:T.accent }} />}
               </button>
             );
           })}
-          {/* More button for extra pages */}
           <button onClick={()=>setSidebarOpen(true)}
             style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center",
               gap:3, padding:"10px 4px", background:"none", border:"none", cursor:"pointer", color:T.dim }}>
@@ -1961,19 +2210,23 @@ export default function App() {
     );
   }
 
-  // ── DESKTOP LAYOUT ──
   return (
     <div style={{ display:"flex", minHeight:"100vh", background:T.bg,
       color:T.text, fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
       {showLogin&&<AdminLoginModal onSuccess={handleAdminSuccess} onClose={()=>setShowLogin(false)} backendAvailable={backendOk} />}
+      {showDaily&&dailyQuestion&&(
+        <DailyChallenge
+          question={dailyQuestion} userName={currentUser?.name||""}
+          onClose={()=>setShowDaily(false)}
+          onSolve={(qid,score)=>{ API.dailyDone(qid,score).catch(()=>{}); if(score>=70)handleSetProgress(p=>({...p,xp:p.xp+50})); }}
+        />
+      )}
 
-      {/* Desktop Sidebar */}
-      <div style={{ width:220, background:T.sidebar, borderRight:`1px solid ${T.border}`,
+      <div style={{ width:230, background:T.sidebar, borderRight:`1px solid ${T.border}`,
         display:"flex", flexDirection:"column", flexShrink:0, position:"sticky", top:0, height:"100vh", overflowY:"auto" }}>
         <SidebarContent />
       </div>
 
-      {/* Main content */}
       <div style={{ flex:1, overflowY:"auto" }}>
         <div style={{ maxWidth:1140, margin:"0 auto", padding:"36px 32px" }}>
           {VIEWS[view]}

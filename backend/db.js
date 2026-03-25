@@ -27,7 +27,12 @@ async function getDb() {
 }
 
 function getDefaultData() {
-  return { cleaning_questions:[], join_questions:[], interview_questions:[], settings:{}, _cleaningSeq:0, _joinSeq:0, _interviewSeq:0 };
+  return {
+    cleaning_questions:[], join_questions:[], interview_questions:[],
+    settings:{},
+    users:[], user_progress:[], daily_completions:[],
+    _cleaningSeq:0, _joinSeq:0, _interviewSeq:0, _userSeq:0
+  };
 }
 
 function nextId(db, seqKey) {
