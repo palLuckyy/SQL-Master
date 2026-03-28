@@ -5,12 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SQL Master — Learn · Practice · Master</title>
     <meta name="description" content="Interactive SQL learning platform with 200+ challenges, JOIN questions, and interview prep" />
+
+    <!-- Preconnect to backend API as early as possible -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Fira Code font — only load what we need -->
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet" />
+
+    <!-- Inline critical CSS to avoid FOUC (flash of unstyled content) -->
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{background:#080c14;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-serif}
+      #root{min-height:100vh}
+      /* Loading spinner shown before React mounts */
+      .init-loader{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px}
+      .init-loader .logo{font-size:28px;font-weight:900;font-family:Georgia,serif}
+      .init-loader .logo span{color:#38bdf8}
+      .init-loader p{color:#64748b;font-size:14px}
+      /* Scrollbar */
+      ::-webkit-scrollbar{width:6px;height:6px}
+      ::-webkit-scrollbar-track{background:#080c14}
+      ::-webkit-scrollbar-thumb{background:#1e2d45;border-radius:99px}
+      ::-webkit-scrollbar-thumb:hover{background:#243350}
+      button{font-family:inherit}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shows instantly before React loads -->
+      <div class="init-loader">
+        <div class="logo"><span>SQL</span>Master</div>
+        <p>Loading...</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

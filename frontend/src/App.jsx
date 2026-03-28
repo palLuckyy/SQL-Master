@@ -1,7 +1,20 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, lazy, Suspense } from "react";
 import { API, saveToken, clearToken, saveUserToken, clearUserToken, getSavedUser, saveUser } from "./api.js";
-import CurriculumView from "./Learn.jsx";
-import AuthGate, { DailyChallenge } from "./Auth.jsx";
+
+// Lazy load heavy components — only downloaded when user navigates there
+const CurriculumView = lazy(() => import("./Learn.jsx"));
+const LazyAuthGate   = lazy(() => import("./Auth.jsx").then(m => ({ default: m.default })));
+const LazyDaily      = lazy(() => import("./Auth.jsx").then(m => ({ default: m.DailyChallenge })));
+
+// Loading fallback
+function ViewLoader() {
+  return (
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:300, color:"#64748b", flexDirection:"column", gap:12 }}>
+      <div style={{ fontSize:28 }}>⚡</div>
+      <div style={{ fontSize:14 }}>Loading...</div>
+    </div>
+  );
+}
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const T = {
@@ -1913,15 +1926,22 @@ export default function App() {
   // ── Load backend data ──
   useEffect(() => {
     async function loadFromBackend() {
+      // First show cached data immediately so UI is responsive
+      setDataLoaded(true);
+      // Then try to fetch fresh data from backend
       try {
-        await API.health();
+        // Race: if backend responds within 8s use it, otherwise use cache
+        const healthPromise = API.health();
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000));
+        await Promise.race([healthPromise, timeout]);
         setBackendOk(true);
         const [c, j, i] = await Promise.all([API.getCleaning(), API.getJoins(), API.getInterview()]);
         if (c.length) setQuestions(c);
         if (j.length) setJoinQuestions(j);
         if (i.length) setInterviewQs(i);
-      } catch {}
-      setDataLoaded(true);
+      } catch {
+        // Backend sleeping or unavailable — localStorage data already shown
+      }
     }
     loadFromBackend();
   }, []);
@@ -2005,7 +2025,11 @@ export default function App() {
   );
 
   // Show auth gate if not logged in and user clicked a protected action
-  if (showAuth) return <AuthGate onAuthenticated={handleUserAuth} />;
+  if (showAuth) return (
+    <Suspense fallback={<div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh",background:"#080c14",color:"#64748b"}}>Loading...</div>}>
+      <LazyAuthGate onAuthenticated={handleUserAuth} />
+    </Suspense>
+  );
 
   const VIEWS = {
     dashboard:   <Dashboard      progress={progress} setView={navigate} questions={questions} joinQuestions={joinQuestions} currentUser={currentUser} onLoginClick={()=>setShowAuth(true)} />,
@@ -2129,11 +2153,13 @@ export default function App() {
         color:T.text, fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
         {showLogin&&<AdminLoginModal onSuccess={handleAdminSuccess} onClose={()=>setShowLogin(false)} backendAvailable={backendOk} />}
         {showDaily&&dailyQuestion&&(
-          <DailyChallenge
-            question={dailyQuestion} userName={currentUser?.name||""}
-            onClose={()=>setShowDaily(false)}
-            onSolve={(qid,score)=>{ API.dailyDone(qid,score).catch(()=>{}); if(score>=70)handleSetProgress(p=>({...p,xp:p.xp+50})); }}
-          />
+          <Suspense fallback={null}>
+            <LazyDaily
+              question={dailyQuestion} userName={currentUser?.name||""}
+              onClose={()=>setShowDaily(false)}
+              onSolve={(qid,score)=>{ API.dailyDone(qid,score).catch(()=>{}); if(score>=70)handleSetProgress(p=>({...p,xp:p.xp+50})); }}
+            />
+          </Suspense>
         )}
 
         <div style={{ position:"sticky", top:0, zIndex:100, background:T.sidebar,
@@ -2181,7 +2207,7 @@ export default function App() {
         )}
 
         <div style={{ flex:1, overflowY:"auto", paddingBottom:70 }}>
-          <div style={{ padding:"16px" }}>{VIEWS[view]}</div>
+          <div style={{ padding:"16px" }}><Suspense fallback={<ViewLoader />}>{VIEWS[view]}</Suspense></div>
         </div>
 
         <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:100,
@@ -2215,11 +2241,13 @@ export default function App() {
       color:T.text, fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
       {showLogin&&<AdminLoginModal onSuccess={handleAdminSuccess} onClose={()=>setShowLogin(false)} backendAvailable={backendOk} />}
       {showDaily&&dailyQuestion&&(
-        <DailyChallenge
-          question={dailyQuestion} userName={currentUser?.name||""}
-          onClose={()=>setShowDaily(false)}
-          onSolve={(qid,score)=>{ API.dailyDone(qid,score).catch(()=>{}); if(score>=70)handleSetProgress(p=>({...p,xp:p.xp+50})); }}
-        />
+        <Suspense fallback={null}>
+          <LazyDaily
+            question={dailyQuestion} userName={currentUser?.name||""}
+            onClose={()=>setShowDaily(false)}
+            onSolve={(qid,score)=>{ API.dailyDone(qid,score).catch(()=>{}); if(score>=70)handleSetProgress(p=>({...p,xp:p.xp+50})); }}
+          />
+        </Suspense>
       )}
 
       <div style={{ width:230, background:T.sidebar, borderRight:`1px solid ${T.border}`,
@@ -2229,7 +2257,7 @@ export default function App() {
 
       <div style={{ flex:1, overflowY:"auto" }}>
         <div style={{ maxWidth:1140, margin:"0 auto", padding:"36px 32px" }}>
-          {VIEWS[view]}
+          <Suspense fallback={<ViewLoader />}>{VIEWS[view]}</Suspense>
         </div>
       </div>
     </div>
